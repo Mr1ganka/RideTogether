@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:ride_together/app/router/app_router.dart';
+import 'package:ride_together/core/theme/app_theme.dart';
 
 class RideTogetherApp extends StatelessWidget {
   const RideTogetherApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'RideTogether',
+    return MaterialApp.router(
+      // title: 'RideTogether',
       debugShowCheckedModeBanner: false,
 
-      themeMode: ThemeMode.dark,
-
-      theme: ThemeData.dark(),
-
-      home: const Scaffold(
-        body: Center(
-          child: Text(
-            'RideTogether',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+      themeMode: ThemeMode.system,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      routerConfig: AppRouter.router,
     );
   }
 }
