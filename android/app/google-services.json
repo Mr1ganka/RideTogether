@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "228297336557",
+    "project_id": "r1detogether",
+    "storage_bucket": "r1detogether.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228297336557:android:58b9e8572ece5ec4a84ee4",
+        "android_client_info": {
+          "package_name": "com.ridetogether.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "228297336557-h2q96s0nbgo2514tkhrmp18k6ifjcpbc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ridetogether.app",
+            "certificate_hash": "d6ccb053bdcc04f4cb4c23b52ff36364ee3fe811"
+          }
+        },
+        {
+          "client_id": "228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjaFpn50_PESs4MNktpw4RMLi6HsnvNL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

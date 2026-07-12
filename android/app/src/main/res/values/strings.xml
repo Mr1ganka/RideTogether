@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">RideTogether</string>
+
+    <string name="default_web_client_id">
+        228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com
+    </string>
+
+</resources>

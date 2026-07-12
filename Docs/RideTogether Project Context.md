@@ -1,148 +1,221 @@
 # RideTogether Project Context
 
+Version: 1.4
 
-## Project Name
-
-RideTogether
-
+Last Updated:
+YYYY-MM-DD
 
 ---
 
-# Project Goal
+# Purpose of This Document
 
+This document is the primary context file for RideTogether.
 
-RideTogether is a mobile-first group ride management application designed for:
+It exists so that any developer or AI assistant can understand:
 
+- What RideTogether is
+- Why the project exists
+- Current implementation status
+- Project architecture
+- Important file locations
+- Development rules
+- Current priorities
+- Future direction
+
+Before making changes, read this document first.
+
+This document should evolve with the project.
+
+Whenever a major feature is completed:
+
+- Update the current status
+- Update architecture changes
+- Update important file locations
+- Update the next development priorities
+
+Do not allow this file to become outdated.
+
+---
+
+# Product Overview
+
+RideTogether is a mobile-first group ride management application.
+
+Target users:
 
 - Motorcycle riders
 - Cyclists
-- Road trips
+- Road trip groups
 - Convoys
 - Adventure groups
 
+RideTogether is not a replacement for navigation applications.
 
-The goal is not to replace Google Maps.
+Navigation applications answer:
 
+"How do I get there?"
 
-The goal is to add live group ride management on top of Google Maps.
+RideTogether answers:
 
+"How do we get there together?"
 
-Concept:
+The application adds a coordination layer on top of navigation services.
 
+Core capabilities:
 
-Google Maps
+- Group ride management
+- Rider synchronization
+- Live rider locations
+- Communication
+- Safety features
+- Ride organization
 
-+
+The product goal:
 
-Discord
+Make group riding easier, safer, and more connected.
 
-+
+Every feature must answer:
 
-Life360
+> Does this make riding in a group easier or safer?
 
-+
+If not, it should not be built.
 
-Group Ride Management
+---
 
+# Product Principles
 
-The app should feel like a co-pilot for group rides.
+RideTogether should remain:
 
+- Simple
+- Fast
+- Reliable
+- Safe
+- Distraction-free
 
-Core question for every feature:
+Important principles:
 
-
-"Does this make riding in a group easier and safer?"
-
-
-If not, do not build it.
-
-
+- The map becomes the primary experience.
+- Riders should interact with the app as little as possible while riding.
+- Controls should be usable with gloves.
+- Battery usage must be considered.
+- Network usage must be optimized.
+- Safety takes priority over unnecessary features.
 
 ---
 
 # Current Development Status
 
-
 ## Current Version
 
-v0.0.1 — Foundation Setup
+```
+v0.0.2 — Authentication Foundation
+```
 
+---
 
-## Environment
+# Completed Features
 
+## Application Foundation
 
 Completed:
 
-
-- Flutter SDK installed
-- VS Code configured
-- Android SDK Command Line Tools installed
-- Java 17+ installed
-- Android Platform Tools installed
-- Android Build Tools installed
-- Flutter doctor passing for Android development
-
-
-Current environment:
-
-
-- Windows 10 Pro 64-bit
-- Flutter stable channel
-- Android physical device available for testing
-- OnePlus 12 verified
-
+- Flutter application created
+- Android development environment configured
+- Physical device testing completed
+- Feature-first architecture created
+- Riverpod integrated
+- GoRouter integrated
+- Google Fonts integrated
+- Material 3 theme foundation created
+- Light and dark theme support created
+- Application routing completed
 
 
 ---
 
-# Completed Development
-
-
-## Application Foundation
-
+# Firebase Setup
 
 Completed:
 
-
-✅ Flutter project created
-
-✅ Android build verified
-
-✅ Physical device testing verified
-
-✅ Default Flutter counter app removed
-
-✅ RideTogether application shell created
-
-✅ Centralized design system created
-
-✅ Material 3 theme foundation created
-
-✅ Light and dark theme support created
-
-✅ Application name updated
-
-✅ Application launcher icon updated
-
-✅ GoRouter navigation implemented
-
-✅ Splash screen flow implemented
-
-✅ Login screen placeholder created
-
-✅ Home screen placeholder created
-
-✅ Application navigation flow verified
+- Firebase project created
+- Android Firebase application registered
+- FlutterFire CLI configured
+- Firebase initialization implemented
 
 
-Application flow:
+Firebase currently used:
+
+- Firebase Core
+- Firebase Authentication
 
 
-Android Device
+Future Firebase services:
+
+- Cloud Firestore
+- Firebase Realtime Database
+- Firebase Messaging
+- Cloud Functions
+- Storage
+- Crashlytics
+- Analytics
+
+---
+
+# Authentication System
+
+Completed:
+
+- Authentication architecture
+- Repository pattern implementation
+- Firebase authentication repository
+- Google Sign-In integration
+- AppUser entity
+- Firebase User → AppUser conversion
+- Authentication providers
+- Login flow
+- Logout flow
+
+
+Authentication architecture:
+
+```
+Login Screen
+
+↓
+
+Auth Provider
+
+↓
+
+Auth Repository
+
+↓
+
+Firebase Authentication
+
+↓
+
+AppUser
+
+↓
+
+Application State
+```
+
+---
+
+# Current Application Flow
+
+```
+Application Start
 
 ↓
 
 main.dart
+
+↓
+
+Firebase.initializeApp()
 
 ↓
 
@@ -166,761 +239,584 @@ SplashScreen
 
 ↓
 
-LoginScreen
+Authentication Check
+
+
+Authenticated
 
 ↓
 
 HomeScreen
 
 
+Unauthenticated
+
+↓
+
+LoginScreen
+```
 
 ---
 
-# Current Architecture
+# Current Development Focus
+
+The project is currently moving from foundation into application features.
+
+Current priority order:
+
+1. Rider profiles
+2. Home screen foundation
+3. Google Maps integration
+4. Ride creation
+5. Ride joining
+6. Live location tracking
+7. Navigation support
+8. Communication
+9. Safety features
 
 
-Architecture:
+Do not jump into advanced features before completing the foundation.
 
+---
+
+# Project Structure
+
+Current structure:
+
+```
+lib/
+
+├── app/
+│   ├── app.dart
+│   └── router/
+│       ├── app_router.dart
+│       └── app_routes.dart
+│
+├── core/
+│   └── theme/
+│       ├── app_theme.dart
+│       ├── app_colors.dart
+│       ├── app_text_styles.dart
+│       ├── app_spacing.dart
+│       ├── app_radius.dart
+│       ├── app_shadows.dart
+│       └── app_durations.dart
+│
+├── features/
+│
+│   ├── auth/
+│   │
+│   │   ├── data/
+│   │   │   ├── models/
+│   │   │   ├── repositories/
+│   │   │   └── datasources/
+│   │   │
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   └── repositories/
+│   │   │
+│   │   └── presentation/
+│   │       ├── screens/
+│   │       ├── widgets/
+│   │       └── providers/
+│
+│   ├── home/
+│   │   └── presentation/
+│
+│   └── startup/
+│       └── presentation/
+│
+├── firebase_options.dart
+│
+└── main.dart
+```
+
+---
+
+# Important File Locations
+
+## Application Startup
+
+Location:
+
+```
+lib/main.dart
+```
+
+Responsible for:
+
+- Flutter initialization
+- Firebase initialization
+- ProviderScope creation
+- Starting the application
+
+
+Do not place business logic here.
+
+---
+
+## Application Configuration
+
+Location:
+
+```
+lib/app/
+```
+
+Contains:
+
+- Application shell
+- Routing
+- Global configuration
+
+
+---
+
+## App Theme
+
+Location:
+
+```
+lib/core/theme/
+```
+
+Important files:
+
+### app_theme.dart
+
+Responsible for:
+
+- Material ThemeData creation
+- Light theme
+- Dark theme
+- Component styling
+
+
+### app_colors.dart
+
+Contains:
+
+- Brand colors
+- Semantic colors
+
+
+### app_text_styles.dart
+
+Contains:
+
+- Typography system
+
+
+### app_spacing.dart
+
+Contains:
+
+- Layout spacing values
+
+
+### app_radius.dart
+
+Contains:
+
+- Border radius values
+
+
+### app_shadows.dart
+
+Contains:
+
+- Elevation and shadows
+
+
+### app_durations.dart
+
+Contains:
+
+- Animation timing
+
+
+Rules:
+
+Never hardcode:
+
+- Colors
+- Font sizes
+- Radius values
+- Spacing values
+
+Use the design system.
+
+---
+
+# Architecture Rules
+
+RideTogether follows:
 
 - Feature-first architecture
 - Repository pattern
-- Riverpod state management
-- Strong typing
-- Null safety
-- Immutable models where possible
+- Separation of concerns
+- Reactive state management
+
+
+General flow:
+
+```
+UI
+
+↓
+
+Providers
+
+↓
+
+Repositories
+
+↓
+
+Services
+
+↓
+
+External Systems
+```
+
+---
+
+# Layer Responsibilities
+
+## Presentation Layer
+
+Contains:
+
+- Screens
+- Widgets
+- Providers
+
+Responsible for:
+
+- Displaying UI
+- Receiving user interaction
+- Consuming state
+
+
+Should NOT contain:
+
+- Firebase calls
+- API calls
+- Business rules
+
+
+---
+
+## Domain Layer
+
+Contains:
+
+- Entities
+- Repository contracts
+- Business rules
+
+
+Should remain independent from external systems.
+
+---
+
+## Data Layer
+
+Contains:
+
+- Models
+- Repository implementations
+- Data sources
+
+
+Responsible for:
+
+- Firebase communication
+- External APIs
+- Data conversion
+
+
+---
+
+# State Management Rules
+
+Riverpod is used for:
+
+- Dependency injection
+- Application state
+- Feature state
 
 
 Rules:
 
+- Widgets consume providers
+- Providers communicate with repositories
+- Repositories communicate with external services
 
-- No business logic inside widgets
-- Providers manage application state
-- Repositories handle data access
-- Services handle external systems
-
-
+Avoid putting application state inside widgets.
 
 ---
 
-# Current Folder Structure
+# Navigation Rules
+
+Navigation is managed through:
+
+```
+lib/app/router/
+```
+
+Using:
+
+- GoRouter
 
 
-lib/
-
-
-app/
-
-
-Application configuration
-
-
-core/
-
-
-config/
-
-
-services/
-
-
-themes/
-
-
-utils/
-
-
-features/
-
-
-auth/
-
-
-profile/
-
-
-home/
-
-
-map/
-
-
-ride/
-
-
-navigation/
-
-
-checkpoints/
-
-
-chat/
-
-
-hazards/
-
-
-notifications/
-
-
-history/
-
-
-settings/
-
-
-shared/
-
-
-models/
-
-
-widgets/
-
-
+Routes should not be created directly inside widgets.
 
 ---
 
-# Technology Stack
+# Android Configuration
 
+Current application identity:
 
-## Mobile
+```
+Package:
+com.ridetogether.app
 
+Namespace:
+com.ridetogether.app
 
-Flutter
+Application ID:
+com.ridetogether.app
+```
 
+Do not change these without updating:
 
-Reasons:
-
-
-- Android and iOS support
-- Single codebase
-- Strong Firebase ecosystem
-- Google Maps support
-
-
-
----
-
-## State Management
-
-
-Riverpod
-
-
-Rules:
-
-
-- No business logic inside widgets
-- Avoid setState for application state
-- Features expose providers
-- Keep state predictable and testable
-
-
+- Firebase configuration
+- Android Gradle configuration
+- google-services.json
 
 ---
 
-## Architecture
+# Product Architecture
+
+## Ride Mode
+
+Current core product.
+
+Ride is a leader-led group movement experience.
+
+Purpose:
+
+Travel together.
+
+Experience:
+
+Follow the leader.
 
 
-Feature-first architecture.
+Planned capabilities:
 
-
-Each feature should contain:
-
-
-data/
-
-
-- models
-- repositories
-- datasources
-
-
-domain/
-
-
-- entities
-- usecases
-
-
-presentation/
-
-
-- screens
-- widgets
-- providers
-
-
-
----
-
-# Backend
-
-
-Firebase ecosystem:
-
-
-- Firebase Authentication
-- Cloud Firestore
-- Realtime Database
-- Cloud Functions
-- Firebase Messaging
-- Firebase Storage
-- Crashlytics
-- Analytics
-
-
-
----
-
-# Maps
-
-
-Google services:
-
-
-- Google Maps SDK
-- Google Directions API
-- Google Places API
-- Google Geocoding API
-
-
-Google Maps handles:
-
-
-- Map rendering
-- Navigation
-- Directions
-- Places
-
-
-RideTogether handles:
-
-
-- Rider groups
+- Create rides
+- Join rides
+- Invite links
+- Ride codes
+- Rider roles
 - Live locations
-- Ride synchronization
+- Shared destination
+- Navigation support
 - Checkpoints
-- Communication
+- Ride communication
+- Regroup features
 - Safety features
 
 
-
 ---
 
-# Main User Roles
+# Future Journey Architecture
 
+Reach is a future feature.
 
-## Leader
+Do not implement during MVP.
 
+Future architecture:
 
-Can:
+```
+Journey
 
+├── Ride Mode
 
-- Create rides
-- Manage checkpoints
-- Change destination
-- Reroute riders
-- Start rides
-- End rides
+└── Reach Mode
+```
 
+A Journey represents shared movement.
 
+Future shared capabilities:
 
-## Co-Leader
-
-
-Can:
-
-
-- Manage rides if leader disconnects
-
-
-
-## Sweep Rider
-
-
-Last rider in formation.
-
-
-Receives:
-
-
-- Rider behind alerts
-- Safety notifications
-
-
-
-## Participant
-
-
-Can:
-
-
-- Follow rides
-- Share location
-- Receive updates
-
-
-
----
-
-# Core Features
-
-
-## Authentication
-
-
-- Google Login
-- Apple Login
-- Email Login
-
-
-
-## Ride Creation
-
-
-- Ride name
+- Members
 - Destination
-- Departure time
-- Visibility
-- Invite code
-- QR code
-- Share link
-
-
-
-## Live Ride
-
-
-Map-first experience:
-
-
-- Google Map
-- Rider locations
-- Leader position
-- Destination
-- ETA
-- Distance
-- Heading
-- Speed
+- Location tracking
 - Status
-- Battery level
-- Offline status
-
-
-
-## Navigation
-
-
-Leader changes route.
-
-
-Followers receive:
-
-
-"Leader updated the route"
-
-
-Actions:
-
-
-- Navigate
-- Dismiss
-
-
-
-## Checkpoints
-
-
-Types:
-
-
-- Fuel stop
-- Breakfast
-- Lunch
-- Photo stop
-- Scenic view
-- Rest stop
-- Custom
-
-
-
-## Ride Chat
-
-
-Includes:
-
-
-- Messages
-- Location sharing
-- Quick actions
-
-
-Quick actions:
-
-
-- Running late
-- Need fuel
-- Mechanical issue
-- Emergency
-
-
-
-## Rider Status
-
-
-States:
-
-
-- Moving
-- Stopped
-- Offline
-- Off route
-- Low battery
-- Emergency
-
-
-
-## Smart Notifications
-
-
-Events:
-
-
-- Leader changed route
-- Checkpoint reached
-- Rider stopped
-- Rider left ride
-- Rider joined
-- Ride starting
-- Ride ending
-
-
-
----
-
-# Future Features
-
-
-- Crash Detection
-- Ride Replay
-- Offline Maps
-- GPX Import
-- Voice Announcements
-- Weather
-- Road Hazards
-- Club Management
-- Ride Analytics
-- Achievements
-- Wear OS
-- Apple Watch
-- Android Auto
-- CarPlay
-
-
-
----
-
-# UI Philosophy
-
-
-Dark mode first, with light mode available through the device appearance
-setting.
-
-
-Design goals:
-
-
-- Large buttons
-- Minimal text
-- Glove friendly
-- Few taps while riding
-- Map is always the primary screen
-
-
-
-Design language:
-
-
-Primary:
-
-Royal Blue
-
-
-Accent:
-
-Orange
-
-
-Danger:
-
-Red
-
-
-Success:
-
-Green
-
-
-Dark:
-
-#121212
-
-
-Light:
-
-#F8F9FC
-
-
-Components:
-
-
-- Rounded cards
-- Large floating action buttons
-- Icons over text wherever possible
-
-
-
----
-
-# Main Map Screen
-
-
-Top:
-
-
-- Ride name
-- Ride status
-- Time
-- Leader
-
-
-Center:
-
-
-- Full screen Google Map
-
-
-Floating buttons:
-
-
-- Navigate
-- Regroup
+- Notifications
 - Chat
-- Hazards
-- Layers
+- Events
+- History
 
 
-Bottom sheet:
+Do not create:
+
+```
+features/journey/
+```
+
+until Reach development begins.
+
+---
+
+# Current Next Tasks
+
+The next development work should focus on:
+
+## 1. Rider Profile System
+
+Build:
+
+- User profile entity
+- Profile storage
+- Rider information
+- Settings foundation
 
 
-- Next checkpoint
-- ETA
-- Distance remaining
-- Ride members
+## 2. Home Foundation
 
+Build:
+
+- Authenticated home experience
+- Application shell
+- Map placeholder
+- User state display
+
+
+## 3. Maps Foundation
+
+Add:
+
+- Google Maps SDK
+- Map screen
+- Location permissions
+
+
+## 4. Ride System
+
+Build:
+
+- Create ride
+- Join ride
+- Ride membership
+- Ride permissions
 
 
 ---
 
-# Data Architecture
+# AI Development Instructions
+
+When modifying this project:
+
+1. Read this document first.
+
+2. Understand the current architecture before adding files.
+
+3. Follow existing folder structure.
+
+4. Do not move files unless architecture requires it.
+
+5. Do not add unnecessary abstractions.
+
+6. Keep business logic outside widgets.
+
+7. Use repositories for external communication.
+
+8. Use providers for state management.
+
+9. Use the existing design system.
+
+10. Update this document after major architectural changes.
+
+---
+
+# Documentation System
+
+Related documents:
+
+## architecture.md
+
+Contains:
+
+- Detailed architecture
+- Technical decisions
+- Folder rules
 
 
-## Firestore
+## instructions.md
+
+Contains:
+
+- Coding rules
+- AI guidelines
+- Development conventions
 
 
-Long-lived data:
+## roadmap.md
+
+Contains:
+
+- Feature roadmap
+- Development phases
+- Future plans
 
 
-Collections:
+## local_setup.md
 
+Contains:
 
-- users
-- rides
-- rideMembers
-- checkpoints
-- messages
-- hazards
-
-
-
-## Realtime Database
-
-
-Fast changing data:
-
-
-- liveLocations
-- ridePresence
-
+- Environment setup
+- Required tools
+- Firebase setup
 
 
 ---
 
-# Services Layer
+# Document Evolution Rules
+
+This file is a living project bookmark.
+
+After completing a major milestone:
+
+Update:
+
+- Version number
+- Current status
+- Completed features
+- Current architecture
+- Next development priorities
 
 
-Required services:
+Do not:
 
+- Remove future plans
+- Mark incomplete features as completed
+- Add speculative architecture without implementation
 
-- LocationService
-- PermissionService
-- RideService
-- ChatService
-- NotificationService
-- NavigationService
-- HazardService
-- StorageService
-- AnalyticsService
-- CrashDetectionService
-
-
-
----
-
-# Repository Layer
-
-
-Repositories:
-
-
-- AuthRepository
-- RideRepository
-- MapRepository
-- LocationRepository
-- ChatRepository
-- HistoryRepository
-- UserRepository
-- NotificationRepository
-
-
+The purpose of this file is to allow any AI or developer to quickly understand RideTogether and continue development without losing project context.
 
 ---
 
-# Development Order
+# Long-Term Vision
 
-
-Completed:
-
-
-1. Project architecture setup
-
-2. Theme system setup
-
-3. Application routing setup
-
-
-Current:
-
-
-4. Authentication foundation
-
-
-Next:
-
-
-5. Firebase setup
-
-6. Firebase Authentication
-
-7. User profile
-
-8. Home screen implementation
-
-9. Google Maps integration
-
-10. Ride creation
-
-11. Joining rides
-
-12. Live location tracking
-
-13. Real-time rider markers
-
-14. Navigation updates
-
-15. Checkpoints
-
-16. Chat
-
-17. Notifications
-
-18. History
-
-19. Testing
-
-20. Performance optimization
-
-
-
----
-
-# Coding Rules
-
-
-Always:
-
-
-- Keep business logic outside widgets
-- Use repositories for external APIs
-- Use providers for state
-- Prefer composition
-- Write reusable components
-- Write tests for business logic
-- Optimize battery usage
-- Optimize Firestore reads
-- Avoid unnecessary rebuilds
-
-
-
----
-
-# Current Next Task
-
-
-Continue with foundation development.
-
-
-Next milestone:
-
-
-## Authentication Foundation
-
-
-Create:
-
-
-features/auth/
-
-
-Goal:
-
-
-Create the authentication architecture before integrating Firebase.
-
-
-Required foundation:
-
-
-- Auth provider
-- Auth state model
-- Authentication repository structure
-- Login flow integration with routing
-
-
-
----
-
-# Product Vision
-
-
-Become the default application for organized group rides.
-
+Become the default platform for organized group rides.
 
 Not just navigation.
 
-
 Not just tracking.
 
-
-The operating system for group riding.
+A complete riding companion for safer and better group experiences.
