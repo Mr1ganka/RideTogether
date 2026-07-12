@@ -8,6 +8,7 @@ import 'package:ride_together/features/auth/presentation/providers/auth_state_pr
 import 'package:ride_together/features/auth/presentation/screens/login_screen.dart';
 import 'package:ride_together/features/home/presentation/screens/home_screen.dart';
 import 'package:ride_together/features/startup/presentation/screens/splash_screen.dart';
+import 'package:ride_together/features/startup/presentation/providers/startup_provider.dart';
 
 
 abstract final class AppRouter {
@@ -16,14 +17,28 @@ abstract final class AppRouter {
 
   static GoRouter createRouter(WidgetRef ref) {
 
-    final authState =
-        ref.watch(authStateProvider);
+    final authState = ref.watch(authStateProvider);
+
+    final startupState = ref.watch(startupProvider);
 
 
     final refreshNotifier =
-        RouterRefreshNotifier(
-          ref.watch(authStateProvider.stream),
-        );
+    RouterRefreshNotifier();
+
+
+    ref.listen(
+      authStateProvider,
+      (_, _) {
+        refreshNotifier.refresh();
+      },
+    );
+
+    ref.listen(
+      startupProvider,
+      (_, _) {
+        refreshNotifier.refresh();
+      },
+    );
 
 
     return GoRouter(
@@ -58,18 +73,15 @@ abstract final class AppRouter {
 
         // Firebase is still checking
         // keep user on splash
-        if (authState.isLoading) {
+        if (startupState.isLoading || authState.isLoading) {
           return AppRoutes.splash;
-        }
+          }
 
 
 
         // User is not logged in
         // send them to login
-        if (!isAuthenticated &&
-            !isLogin &&
-            !isSplash) {
-
+        if (!isAuthenticated && !isLogin) {
           return AppRoutes.login;
         }
 

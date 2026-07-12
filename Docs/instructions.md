@@ -1,6 +1,6 @@
 ﻿# RideTogether AI Development Instructions
 
-Version: 1.3
+Version: 1.4
 
 ---
 
@@ -8,24 +8,24 @@ Version: 1.3
 
 RideTogether is a mobile-first group ride management application designed for:
 
-- Motorcycle riders
-- Cyclists
-- Road trips
-- Convoys
-- Adventure groups
+* Motorcycle riders
+* Cyclists
+* Road trips
+* Convoys
+* Adventure groups
 
 RideTogether is not a replacement for navigation applications.
 
-The purpose of RideTogether is to add a group management layer on top of existing navigation services.
+The purpose of RideTogether is to add a group management and coordination layer on top of existing navigation services.
 
 The application provides:
 
-- Group ride management
-- Rider synchronization
-- Live rider locations
-- Communication
-- Safety features
-- Ride coordination
+* Group ride management
+* Rider synchronization
+* Live rider locations
+* Communication
+* Safety features
+* Ride coordination
 
 RideTogether should feel like a co-pilot for group rides.
 
@@ -41,15 +41,23 @@ If the answer is no, do not build it.
 
 The application should remain:
 
-- Simple
-- Fast
-- Reliable
-- Safe
-- Distraction-free
+* Simple
+* Fast
+* Reliable
+* Safe
+* Distraction-free
 
 The map is the primary experience.
 
 Features should minimize interaction while riding.
+
+Important principles:
+
+* Avoid unnecessary rider interaction during rides
+* Optimize battery usage
+* Optimize network usage
+* Keep controls usable while riding
+* Safety takes priority over feature quantity
 
 ---
 
@@ -57,45 +65,177 @@ Features should minimize interaction while riding.
 
 ## Version
 
-v0.0.2 — Authentication Foundation
+```
+v0.0.3 — Rider Identity Foundation
+```
 
+---
 
-## Completed
+# Completed Features
 
-### Application Foundation
+## Application Foundation
 
-- Flutter project created
-- Android environment configured
-- Physical device testing completed
-- Feature-first architecture created
-- Riverpod integrated
-- GoRouter integrated
-- Google Fonts integrated
-- Application shell created
-- Material 3 theme foundation created
-- Light and dark theme support implemented
-- Splash screen implemented
-- Login screen implemented
-- Home screen implemented
+Completed:
 
+* Flutter project created
+* Android environment configured
+* Physical device testing completed
+* Feature-first architecture created
+* Riverpod integrated
+* GoRouter integrated
+* Google Fonts integrated
+* Application shell created
+* Material 3 theme foundation created
+* Light and dark theme support implemented
+* Splash screen implemented
+* Login screen implemented
+* Home screen implemented
+* Application routing implemented
 
-### Firebase Foundation
+---
 
-- Firebase project created
-- Firebase Android application configured
-- FlutterFire CLI configured
-- Firebase initialization completed
+## Firebase Foundation
 
+Completed:
 
-### Authentication
+* Firebase project created
+* Firebase Android application configured
+* FlutterFire CLI configured
+* Firebase initialization completed
 
-- Authentication repository architecture created
-- Google Sign-In implemented
-- Firebase Authentication implemented
-- AppUser domain model created
-- Login flow implemented
-- Logout flow implemented
+Current Firebase services:
 
+* Firebase Core
+* Firebase Authentication
+* Cloud Firestore
+
+Future Firebase services:
+
+* Firebase Realtime Database
+* Cloud Functions
+* Firebase Messaging
+* Storage
+* Crashlytics
+* Analytics
+
+---
+
+## Authentication
+
+Completed:
+
+* Authentication repository architecture created
+* Google Sign-In implemented
+* Firebase Authentication implemented
+* AppUser domain model created
+* Firebase user mapping implemented
+* Authentication providers created
+* Login flow implemented
+* Logout flow implemented
+* Authentication state handling implemented
+* Startup authentication checking implemented
+
+Authentication flow:
+
+```
+Login Screen
+
+↓
+
+Auth Provider
+
+↓
+
+Auth Repository
+
+↓
+
+Firebase Authentication
+
+↓
+
+AppUser
+
+↓
+
+Application State
+```
+
+---
+
+# Rider Identity System
+
+Completed:
+
+* RiderProfile entity created
+* Profile repository abstraction created
+* Firebase profile repository implemented
+* Firestore profile datasource created
+* Profile providers created
+* Automatic profile creation implemented
+* Existing profile loading implemented
+
+Rider identity purpose:
+
+Authentication answers:
+
+"Who is this user?"
+
+Rider profile answers:
+
+"Who is this rider inside RideTogether?"
+
+Profile flow:
+
+```
+User Authentication
+
+↓
+
+Auth State Provider
+
+↓
+
+Current Profile Provider
+
+↓
+
+Check Firestore Profile
+
+↓
+
+Profile Exists
+
+OR
+
+Create Rider Profile
+
+↓
+
+Application Uses Rider Identity
+```
+
+Firestore structure:
+
+```
+users
+
+ └── {userId}
+
+      ├── displayName
+      ├── email
+      ├── photoUrl
+      ├── createdAt
+      └── updatedAt
+```
+
+Future rider profile additions:
+
+* Motorcycle information
+* Rider avatar
+* Riding preferences
+* Privacy settings
+* Emergency information
 
 ---
 
@@ -103,16 +243,15 @@ v0.0.2 — Authentication Foundation
 
 RideTogether uses:
 
-- Flutter
-- Riverpod
-- GoRouter
-- Feature-first architecture
-- Repository pattern
-- Strong typing
-- Null safety
+* Flutter
+* Riverpod
+* GoRouter
+* Feature-first architecture
+* Repository pattern
+* Strong typing
+* Null safety
 
-
-Architecture rules:
+Architecture principles:
 
 Widgets display information.
 
@@ -122,9 +261,9 @@ Repositories manage application data.
 
 Services communicate with external systems.
 
+Architecture flow:
 
-The architecture flow:
-
+```
 UI
 
 ↓
@@ -142,10 +281,11 @@ Services
 ↓
 
 External Systems
-
+```
 
 Example:
 
+```
 Login Screen
 
 ↓
@@ -159,7 +299,25 @@ Auth Repository
 ↓
 
 Firebase Authentication
+```
 
+Profile example:
+
+```
+Profile State Provider
+
+↓
+
+Profile Repository
+
+↓
+
+Firebase Profile Repository
+
+↓
+
+Cloud Firestore
+```
 
 ---
 
@@ -167,6 +325,7 @@ Firebase Authentication
 
 Current structure:
 
+```
 lib/
 
 app/
@@ -193,10 +352,11 @@ shared/
 
 - Reusable components
 - Shared models
-
+```
 
 Feature structure:
 
+```
 feature/
 
 data/
@@ -218,7 +378,7 @@ presentation/
 - Screens
 - Widgets
 - Providers
-
+```
 
 ---
 
@@ -228,27 +388,29 @@ Current Android identity:
 
 Package:
 
+```
 com.ridetogether.app
-
+```
 
 Namespace:
 
+```
 com.ridetogether.app
-
+```
 
 Application ID:
 
+```
 com.ridetogether.app
-
+```
 
 Do not change these values without updating:
 
-- Firebase Android configuration
-- google-services.json
-- MainActivity package
-- Gradle namespace
-- Gradle applicationId
-
+* Firebase Android configuration
+* google-services.json
+* MainActivity package
+* Gradle namespace
+* Gradle applicationId
 
 ---
 
@@ -260,25 +422,22 @@ Widgets should only handle UI rendering.
 
 Widgets should:
 
-- Display information
-- Receive state
-- Trigger user actions
-
+* Display information
+* Receive state
+* Trigger user actions
 
 Widgets should not contain:
 
-- Firebase calls
-- API calls
-- Business logic
-- Data processing
-
+* Firebase calls
+* API calls
+* Business logic
+* Data processing
 
 Business logic belongs in:
 
-- Providers
-- Repositories
-- Services
-
+* Providers
+* Repositories
+* Services
 
 ---
 
@@ -286,18 +445,17 @@ Business logic belongs in:
 
 Riverpod manages:
 
-- Application state
-- Feature state
-- Dependency injection
-- Reactive updates
-
+* Application state
+* Feature state
+* Dependency injection
+* Reactive updates
 
 Rules:
 
-- Widgets consume providers
-- Providers communicate with repositories
-- Repositories communicate with services
-
+* Widgets consume providers
+* Providers communicate with repositories
+* Repositories communicate with services
+* Avoid storing application state inside widgets
 
 ---
 
@@ -305,9 +463,9 @@ Rules:
 
 Repositories separate application logic from external systems.
 
-
 Example:
 
+```
 AuthRepository
 
 ↓
@@ -317,10 +475,41 @@ FirebaseAuthRepository
 ↓
 
 Firebase
-
+```
 
 Features should depend on repository abstractions rather than directly accessing external services.
 
+Never:
+
+```
+Widget
+
+↓
+
+Firebase
+```
+
+Preferred:
+
+```
+Widget
+
+↓
+
+Provider
+
+↓
+
+Repository
+
+↓
+
+Service
+
+↓
+
+External System
+```
 
 ---
 
@@ -328,31 +517,31 @@ Features should depend on repository abstractions rather than directly accessing
 
 All UI styling must use:
 
-lib/core/themes/
-
+```
+lib/core/theme/
+```
 
 The design system controls:
 
-- Colors
-- Typography
-- Spacing
-- Radius
-- Shadows
-- Animations
-- Component styling
-
+* Colors
+* Typography
+* Spacing
+* Radius
+* Shadows
+* Animations
+* Component styling
 
 Do not:
 
-- Hardcode colors
-- Add random spacing values
-- Create feature-specific theme systems
-
+* Hardcode colors
+* Add random spacing values
+* Create feature-specific theme systems
 
 Use Flutter theme values:
 
+```
 Theme.of(context)
-
+```
 
 ---
 
@@ -360,13 +549,14 @@ Theme.of(context)
 
 Development order:
 
-1. Stabilize authentication
-2. Improve application shell
-3. Implement map foundation
+1. Complete map foundation
+2. Integrate location permissions
+3. Create map experience
 4. Create Ride feature
 5. Add live location tracking
 6. Add group synchronization
 
+Do not jump into advanced features before MVP foundations are complete.
 
 ---
 
@@ -378,17 +568,17 @@ Reach is a future feature.
 
 Do not implement Reach during MVP.
 
-
 Future architecture:
 
+```
 Journey
 
 - Ride
-- Reach
 
+- Reach
+```
 
 A Journey represents a shared group movement activity.
-
 
 ---
 
@@ -396,21 +586,19 @@ A Journey represents a shared group movement activity.
 
 Future shared Journey functionality may include:
 
-- Members
-- Destination
-- Location tracking
-- Map visualization
-- Status
-- Notifications
-- Chat
-- Events
-- History
-
+* Members
+* Destination
+* Location tracking
+* Map visualization
+* Status
+* Notifications
+* Chat
+* Events
+* History
 
 Shared functionality should be implemented once inside Journey.
 
 Do not duplicate shared systems between Ride and Reach.
-
 
 ---
 
@@ -418,35 +606,29 @@ Do not duplicate shared systems between Ride and Reach.
 
 Ride is the current MVP feature.
 
-
 Purpose:
 
 Travel together.
-
 
 Experience:
 
 Follow the leader.
 
-
 Control:
 
 Leader controlled.
 
-
 Ride capabilities:
 
-- Leader
-- Route control
-- Checkpoints
-- Regroup commands
-- Group synchronization
-
+* Leader
+* Route control
+* Checkpoints
+* Regroup commands
+* Group synchronization
 
 Example:
 
 "Follow me to the mountain viewpoint."
-
 
 ---
 
@@ -454,34 +636,28 @@ Example:
 
 Reach is a future destination-based group activity.
 
-
 Purpose:
 
 Meet at a destination.
-
 
 Experience:
 
 Everyone travels independently.
 
-
 Control:
 
 No leader.
 
-
 Reach capabilities:
 
-- Shared destination
-- Individual navigation
-- Arrival tracking
-- Participant progress
-
+* Shared destination
+* Individual navigation
+* Arrival tracking
+* Participant progress
 
 Example:
 
 "Everyone meet at this café."
-
 
 ---
 
@@ -489,31 +665,28 @@ Example:
 
 Future Journey model:
 
-- id
-- creatorId
-- destination
-- members
-- status
-- type
-
+* id
+* creatorId
+* destination
+* members
+* status
+* type
 
 Journey types:
 
-- Ride
-- Reach
-
+* Ride
+* Reach
 
 Mode-specific behavior should extend Journey.
 
 Do not duplicate:
 
-- Membership
-- Location tracking
-- Status handling
-- Notifications
-- Chat
-- History
-
+* Membership
+* Location tracking
+* Status handling
+* Notifications
+* Chat
+* History
 
 ---
 
@@ -523,6 +696,7 @@ Do not restructure the current project for Reach.
 
 After MVP completion, future Journey functionality may be organized as:
 
+```
 features/
 
 journey/
@@ -532,6 +706,5 @@ data/
 domain/
 
 presentation/
-
-
+```
 Reach should only be implemented after current MVP priorities are complete.

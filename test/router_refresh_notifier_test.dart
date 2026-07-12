@@ -6,7 +6,7 @@ import 'package:ride_together/app/router/router_refresh_notifier.dart';
 void main() {
   test('notifies listeners for each auth-state update', () async {
     final controller = StreamController<Object?>();
-    final notifier = RouterRefreshNotifier(controller.stream);
+    final notifier = RouterRefreshNotifier();
     var notifications = 0;
     notifier.addListener(() => notifications++);
 

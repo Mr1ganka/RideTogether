@@ -126,7 +126,136 @@ flutterfire --version
 
 ---
 
-# 2. Android SDK Configuration
+# 2. VS Code Setup
+
+VS Code is the recommended development environment for RideTogether.
+
+Install the following extensions.
+
+---
+
+## Required Extensions
+
+## Flutter
+
+Extension:
+
+```text
+Dart-Code.flutter
+```
+
+Purpose:
+
+- Flutter project support
+- Hot reload and hot restart
+- Flutter debugging
+- Device management
+- Widget inspection
+
+---
+
+## Dart
+
+Extension:
+
+```text
+Dart-Code.dart-code
+```
+
+Purpose:
+
+- Dart language support
+- Code completion
+- Refactoring
+- Formatting
+- Debugging
+
+---
+
+# Recommended Extensions
+
+## Flutter Widget Snippets
+
+Purpose:
+
+- Quickly create common Flutter widgets
+- Speed up UI development
+
+Useful for:
+
+- StatelessWidget
+- StatefulWidget
+- ConsumerWidget
+- Common Flutter layouts
+
+---
+
+## Gradle for Java
+
+Purpose:
+
+- Android Gradle file support
+- Syntax highlighting
+- Easier Android build configuration
+
+Useful files:
+
+```text
+android/build.gradle
+android/app/build.gradle
+settings.gradle
+```
+
+---
+
+## Error Lens
+
+Purpose:
+
+- Shows errors and warnings inline
+- Faster debugging
+
+---
+
+## YAML
+
+Purpose:
+
+Better support for:
+
+- pubspec.yaml
+- Firebase configuration
+- CI/CD files
+
+---
+
+## GitLens
+
+Purpose:
+
+- Git history
+- Code ownership
+- Change tracking
+
+---
+
+## Recommended VS Code Settings
+
+Enable formatting on save:
+
+```json
+{
+    "editor.formatOnSave": true,
+    "dart.lineLength": 100,
+    "dart.previewFlutterUiGuides": true
+}
+```
+
+Restart VS Code after installing extensions.
+
+---
+
+# 3. Android SDK Configuration
 
 If Flutter cannot locate Android SDK:
 
@@ -142,7 +271,7 @@ flutter doctor --android-licenses
 
 ---
 
-# 3. Clone and Run Project
+# 4. Clone and Run Project
 
 Clone repository:
 
@@ -186,7 +315,7 @@ flutter run -d <device-id>
 
 ---
 
-# 4. Android Device Setup
+# 5. Android Device Setup
 
 For a physical Android device:
 
@@ -208,7 +337,7 @@ flutter devices
 
 ---
 
-# 5. Firebase Setup
+# 6. Firebase Setup
 
 RideTogether currently uses Firebase for:
 
@@ -227,7 +356,6 @@ Future Firebase services:
 - Storage
 - Crashlytics
 - Analytics
-
 
 Current Firebase project:
 
@@ -320,8 +448,7 @@ platform Firebase configuration files
 ```
 
 ---
-
-# 6. Application Structure
+# 7. Application Structure
 
 Current structure:
 
@@ -368,7 +495,7 @@ lib/
 
 ---
 
-# 7. Current Application Flow
+# 8. Current Application Flow
 
 ```text
 Android Device
@@ -425,7 +552,7 @@ Authentication Check
 
 ---
 
-# 8. Development Rules
+# 9. Development Rules
 
 RideTogether follows:
 
@@ -457,7 +584,9 @@ Services
 External Systems
 ```
 
-Responsibilities:
+---
+
+# Responsibilities
 
 ## Widgets
 
@@ -472,6 +601,7 @@ Avoid:
 - API calls
 - Business logic
 
+---
 
 ## Providers
 
@@ -481,6 +611,7 @@ Responsible for:
 - Dependency injection
 - Reactive updates
 
+---
 
 ## Repositories
 
@@ -489,6 +620,7 @@ Responsible for:
 - Data operations
 - External data boundaries
 
+---
 
 ## Services
 
@@ -501,7 +633,7 @@ Responsible for:
 
 ---
 
-# 9. Design System
+# 10. Design System
 
 All UI styling uses:
 
@@ -544,7 +676,7 @@ for adaptive styling.
 
 ---
 
-# 10. Platform Support
+# 11. Platform Support
 
 ## Android
 
@@ -554,6 +686,7 @@ Supported:
 - Firebase integration
 - Physical device testing
 
+---
 
 ## iOS
 
@@ -566,6 +699,7 @@ Required before development:
 - CocoaPods
 - FlutterFire configuration
 
+---
 
 ## Web/Desktop
 
@@ -575,7 +709,7 @@ Firebase configuration must be regenerated before use.
 
 ---
 
-# 11. Maps Setup
+# 12. Maps Setup
 
 Google Maps is planned but not currently configured.
 
@@ -596,7 +730,196 @@ When added:
 
 ---
 
-# 12. Daily Development Commands
+# 13. Graphify AI Context Maintenance
+
+RideTogether uses Graphify to maintain an AI-readable understanding of the application's architecture.
+
+Graphify creates a graph representation of the codebase, helping AI tools understand:
+
+- Feature relationships
+- Code dependencies
+- Architecture boundaries
+- Major components
+- Changes introduced over time
+
+Graphify is a generated view of the current implementation.
+
+It does not replace project documentation.
+
+The sources of truth are:
+
+1. Current codebase
+2. Documentation in `/docs`
+3. Graphify generated reports
+
+---
+
+# Graphify Setup
+
+Graphify requires:
+
+- Graphify CLI
+- Gemini API key for semantic extraction
+
+The Gemini API key must remain private.
+
+Store it locally in:
+
+```text
+.env
+```
+
+Example:
+
+```text
+GEMINI_API_KEY=your_key_here
+```
+
+Ensure `.env` is included in:
+
+```text
+.gitignore
+```
+
+Never commit API keys.
+
+---
+
+# Running Graphify
+
+Run Graphify from the project root:
+
+```bash
+graphify .
+```
+
+This generates:
+
+```text
+graphify-out/
+
+├── graph.json
+├── .graphify_analysis.json
+```
+
+Generate the readable architecture report:
+
+```bash
+graphify cluster-only .
+```
+
+This creates:
+
+```text
+graphify-out/GRAPH_REPORT.md
+```
+
+---
+
+# When to Update Graphify
+
+Graphify does not need to run after every small code change.
+
+Run Graphify after major changes such as:
+
+- Adding a new feature
+- Creating a new feature folder
+- Adding Firebase services
+- Adding Google Maps functionality
+- Changing authentication flow
+- Changing state management
+- Refactoring architecture
+- Adding new external integrations
+- Changing repository structure
+
+Examples:
+
+Adding:
+
+```text
+features/rides/
+```
+
+Run Graphify after completion.
+
+Changing:
+
+```text
+Authentication architecture
+```
+
+Run Graphify after completion.
+
+---
+
+# Recommended AI Workflow
+
+Before asking an AI coding assistant to make large changes:
+
+## 1. Refresh Graphify
+
+Run:
+
+```bash
+graphify .
+
+graphify cluster-only .
+```
+
+---
+
+## 2. Review Architecture Report
+
+Review:
+
+```text
+graphify-out/GRAPH_REPORT.md
+```
+
+---
+
+## 3. Provide Context to AI Tools
+
+When asking AI tools for architectural changes, provide:
+
+```text
+docs/
+
+graphify-out/GRAPH_REPORT.md
+```
+
+Example prompt:
+
+```text
+Review the current architecture using:
+
+- docs/architecture.md
+- docs/projectcontext.md
+- graphify-out/GRAPH_REPORT.md
+
+Identify risks before making changes.
+```
+
+---
+
+# Graphify Maintenance Rules
+
+Do:
+
+- Regenerate after major architectural changes
+- Keep generated output separate from documentation
+- Use reports to validate architecture decisions
+
+Do not:
+
+- Manually edit graph.json
+- Treat Graphify output as the roadmap
+- Replace architecture documentation with generated reports
+- Commit API keys
+
+---
+
+# 14. Daily Development Commands
 
 Install dependencies:
 
@@ -638,7 +961,7 @@ flutter pub get
 
 ---
 
-# 13. Source Control Rules
+# 15. Source Control Rules
 
 Commit:
 
@@ -667,12 +990,14 @@ android/local.properties
 
 ios/Pods/
 
+.env
+
 IDE configuration files
 ```
 
 ---
 
-# 14. Troubleshooting
+# 16. Troubleshooting
 
 | Problem | Solution |
 |---|---|
@@ -682,7 +1007,9 @@ IDE configuration files
 | Android device missing | Enable USB debugging |
 | Java build errors | Verify JDK 17 |
 | Firebase configuration error | Check package name and Firebase project |
-| Build cache problems | Run flutter clean then flutter pub get |
+| Build cache problems | Run `flutter clean` then `flutter pub get` |
+| Graphify cannot find Gemini key | Check `.env` and `GEMINI_API_KEY` configuration |
+| Graphify semantic extraction fails | Verify Gemini API quota and Graphify dependencies |
 
 ---
 
@@ -723,3 +1050,29 @@ Update this document when:
 - Authentication flow changes
 - Architecture changes
 - Development requirements change
+- New development tools are required
+- AI development workflow changes
+
+---
+
+# Final Setup Checklist
+
+A new developer should have:
+
+- Flutter installed
+- Android Studio configured
+- JDK 17 installed
+- Firebase CLI installed
+- FlutterFire CLI installed
+- VS Code extensions installed
+- Environment variables configured
+- Firebase files available
+- Dependencies installed
+- Device/emulator available
+- Graphify configured for AI context updates
+
+The project should then run successfully with:
+
+```bash
+flutter run
+```

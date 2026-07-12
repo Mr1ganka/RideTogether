@@ -1,6 +1,6 @@
 ﻿# RideTogether Roadmap
 
-Version: 1.3
+Version: 1.4
 
 ---
 
@@ -8,19 +8,31 @@ Version: 1.3
 
 ## Current Version
 
-v0.0.2 — Authentication Foundation
+```
+v0.0.3 — Rider Identity Foundation
+```
 
+---
 
-## Current Status
+# Current Status
 
 The application foundation is complete.
 
-Authentication foundation has been implemented.
+Authentication and rider identity foundations have been implemented.
 
 Current development priority:
 
-Authentication → Application Shell → Maps → Ride System
-
+```
+Authentication
+↓
+Rider Identity
+↓
+Map Foundation
+↓
+Ride System
+↓
+Live Tracking
+```
 
 ---
 
@@ -30,65 +42,205 @@ Authentication → Application Shell → Maps → Ride System
 
 Completed:
 
-- Flutter project created
-- Android development environment configured
-- Physical device testing verified
-- Feature-first architecture created
-- Riverpod integrated
-- GoRouter integrated
-- Google Fonts integrated
-- Application shell created
-- Material 3 theme system created
-- Light and dark theme support created
-- Application routing implemented
-- Splash screen implemented
-- Login screen implemented
-- Home screen implemented
+* Flutter project created
+* Android development environment configured
+* Physical device testing verified
+* Feature-first architecture created
+* Riverpod integrated
+* GoRouter integrated
+* Google Fonts integrated
+* Application shell created
+* Material 3 theme system created
+* Light and dark theme support created
+* Application routing implemented
+* Splash screen implemented
+* Login screen implemented
+* Home screen implemented
 
+---
 
 ## Android Configuration
 
 Package:
 
+```
 com.ridetogether.app
-
+```
 
 Namespace:
 
+```
 com.ridetogether.app
-
+```
 
 Application ID:
 
+```
 com.ridetogether.app
+```
 
+---
 
 ## Firebase Foundation
 
 Completed:
 
-- Firebase project created
-- Firebase Android application configured
-- FlutterFire CLI configured
-- Firebase initialization completed
+* Firebase project created
+* Firebase Android application configured
+* FlutterFire CLI configured
+* Firebase initialization completed
+* Firebase Authentication integrated
+* Cloud Firestore integrated for rider profiles
 
+Current Firebase services:
 
-## Authentication
+* Firebase Core
+* Firebase Authentication
+* Cloud Firestore
+
+Future Firebase services:
+
+* Firebase Realtime Database
+* Cloud Functions
+* Firebase Messaging
+* Storage
+* Crashlytics
+* Analytics
+
+---
+
+# Authentication
+
+Status:
+
+Complete
 
 Completed:
 
-- Authentication repository architecture created
-- Google Sign-In implemented
-- Firebase Authentication implemented
-- AppUser model created
-- Login flow implemented
-- Logout flow implemented
+* Authentication repository architecture created
+* Google Sign-In implemented
+* Firebase Authentication implemented
+* AppUser domain model created
+* Firebase user mapping implemented
+* Authentication providers created
+* Login flow implemented
+* Logout flow implemented
+* Authentication state handling implemented
+* Startup authentication checking implemented
 
+Authentication flow:
+
+```
+Login Screen
+
+↓
+
+Auth Provider
+
+↓
+
+Auth Repository
+
+↓
+
+Firebase Authentication
+
+↓
+
+AppUser
+
+↓
+
+Application State
+```
+
+---
+
+# Rider Identity System
+
+Status:
+
+Complete
+
+Purpose:
+
+Extend authenticated identity into an application-specific rider profile.
+
+Authentication answers:
+
+"Who is this user?"
+
+Rider profile answers:
+
+"Who is this rider inside RideTogether?"
+
+Completed:
+
+* RiderProfile entity created
+* Profile repository abstraction created
+* Firebase profile repository implemented
+* Firestore profile datasource created
+* Profile providers created
+* Automatic profile creation implemented
+* Existing profile loading implemented
+
+Profile creation flow:
+
+```
+User authenticates
+
+↓
+
+Authentication State
+
+↓
+
+Current Profile Provider
+
+↓
+
+Check Firestore profile
+
+↓
+
+Profile exists
+
+OR
+
+Create new RiderProfile
+
+↓
+
+Application uses rider identity
+```
+
+Firestore structure:
+
+```
+users
+
+ └── {userId}
+
+      ├── displayName
+      ├── email
+      ├── photoUrl
+      ├── createdAt
+      └── updatedAt
+```
+
+Future rider profile extensions:
+
+* Motorcycle information
+* Rider avatar
+* Riding preferences
+* Privacy settings
+* Emergency information
 
 ---
 
 # Current Application Flow
 
+```
 Android Device
 
 ↓
@@ -121,12 +273,24 @@ SplashScreen
 
 ↓
 
+Startup Check
+
+↓
+
 Authentication Check
 
 ↓
 
-LoginScreen or HomeScreen
+LoginScreen
 
+OR
+
+HomeScreen
+
+↓
+
+Current Rider Profile Loaded
+```
 
 ---
 
@@ -136,46 +300,45 @@ Status:
 
 Complete
 
-
 Completed:
 
-- Flutter setup
-- Android configuration
-- Architecture setup
-- Theme system
-- Navigation system
-- Firebase setup
-- Authentication foundation
-
+* Flutter setup
+* Android configuration
+* Architecture setup
+* Theme system
+* Navigation system
+* Firebase setup
+* Authentication foundation
+* Rider identity foundation
 
 Deliverable:
 
-User can launch the application, authenticate, and enter the application shell.
-
+User can launch the application, authenticate, and enter the application shell with a stored rider profile.
 
 ---
 
-# Phase 2 — Rider Accounts
+# Phase 2 — Map Foundation
 
 Status:
 
-Planned
+Current Development
 
+Goal:
+
+Create the core map experience.
 
 Features:
 
-- User profiles
-- Rider information
-- Motorcycle information
-- Profile avatar
-- Account settings
-- Privacy controls
-
+* Google Maps integration
+* Map screen foundation
+* Current location display
+* Location permissions
+* Map UI components
+* Map state management
 
 Deliverable:
 
-Complete rider identity system.
-
+RideTogether has a working map experience.
 
 ---
 
@@ -185,256 +348,198 @@ Status:
 
 Planned
 
-
 Features:
 
-- Create Ride
-- Join Ride
-- Invite links
-- Ride codes
-- QR code joining
-- Ride permissions
-
+* Create Ride
+* Join Ride
+* Invite links
+* Ride codes
+* QR code joining
+* Ride permissions
+* Rider roles
 
 Deliverable:
 
 Users can create and join group rides.
 
-
 ---
 
-# Phase 4 — Map Foundation
+# Phase 4 — Live Tracking
 
 Status:
 
 Planned
 
-
 Features:
 
-- Google Maps integration
-- Map screen foundation
-- Current location display
-- Destination selection
-- Map UI components
-
-
-Deliverable:
-
-RideTogether map experience.
-
-
----
-
-# Phase 5 — Live Tracking
-
-Status:
-
-Planned
-
-
-Features:
-
-- GPS permissions
-- Location service
-- Location updates
-- Firebase Realtime Database integration
-- Live rider markers
-- Leader tracking
-- Rider status
-- Battery status
-
+* GPS permissions
+* Location service
+* Location updates
+* Firebase Realtime Database integration
+* Live rider markers
+* Leader tracking
+* Rider status
+* Battery status
 
 Deliverable:
 
 Group members can see each other live on the map.
 
-
 ---
 
-# Phase 6 — Navigation
+# Phase 5 — Navigation
 
 Status:
 
 Planned
 
-
 Features:
 
-- Google Directions API
-- Route display
-- Destination handling
-- Leader route updates
-- Waypoints
-- ETA calculation
-- Distance calculation
-
+* Google Directions API
+* Route display
+* Destination handling
+* Leader route updates
+* Waypoints
+* ETA calculation
+* Distance calculation
 
 Deliverable:
 
 Shared group navigation experience.
 
-
 ---
 
-# Phase 7 — Checkpoints
+# Phase 6 — Checkpoints
 
 Status:
 
 Planned
 
-
 Features:
 
-- Fuel stops
-- Break stops
-- Custom checkpoints
-- Arrival detection
-- Checkpoint notifications
-
+* Fuel stops
+* Break stops
+* Custom checkpoints
+* Arrival detection
+* Checkpoint notifications
 
 Deliverable:
 
 Checkpoint management system.
 
-
 ---
 
-# Phase 8 — Ride Communication
+# Phase 7 — Ride Communication
 
 Status:
 
 Planned
 
-
 Features:
 
-- Ride chat
-- Quick messages
-- Emergency button
-- Leader broadcasts
-
+* Ride chat
+* Quick messages
+* Emergency button
+* Leader broadcasts
 
 Deliverable:
 
 Basic ride communication system.
 
-
 ---
 
-# Phase 9 — Smart Ride Features
+# Phase 8 — Smart Ride Features
 
 Status:
 
 Planned
 
-
 Features:
 
-- Regroup functionality
-- Off-route detection
-- Stopped rider detection
-- Low battery alerts
-- Ride timeline
-
+* Regroup functionality
+* Off-route detection
+* Stopped rider detection
+* Low battery alerts
+* Ride timeline
 
 Deliverable:
 
 RideTogether-specific intelligence features.
 
-
 ---
 
-# Phase 10 — Ride History
+# Phase 9 — Ride History
 
 Status:
 
 Planned
 
-
 Features:
 
-- Ride replay
-- Distance statistics
-- Average speed
-- Ride photos
-- Ride summaries
-
+* Ride replay
+* Distance statistics
+* Average speed
+* Ride photos
+* Ride summaries
 
 Deliverable:
 
 Complete ride history experience.
 
-
 ---
 
-# Phase 11 — Safety Features
+# Phase 10 — Safety Features
 
 Status:
 
 Planned
 
-
 Features:
 
-- Crash detection
-- Emergency contacts
-- Hazard reporting
-- Voice alerts
-
+* Crash detection
+* Emergency contacts
+* Hazard reporting
+* Voice alerts
 
 Deliverable:
 
 Safety-focused riding experience.
 
-
 ---
 
-# Phase 12 — Community Features
+# Future Features
+
+## Community Features
 
 Status:
 
 Future
 
-
 Features:
 
-- Clubs
-- Events
-- Public rides
-- Achievements
-- Leaderboards
-- Ride discovery
-
-
-Deliverable:
-
-Community platform for riders.
-
+* Clubs
+* Events
+* Public rides
+* Achievements
+* Leaderboards
+* Ride discovery
 
 ---
 
-# Phase 13 — Premium Features
+## Premium Features
 
 Status:
 
 Future
 
-
 Features:
 
-- Offline maps
-- GPX import
-- Weather layers
-- Advanced analytics
-- Cloud backup
-- Priority support
-
-
-Deliverable:
-
-Premium subscription offering.
-
+* Offline maps
+* GPX import
+* Weather layers
+* Advanced analytics
+* Cloud backup
+* Priority support
 
 ---
 
@@ -442,69 +547,41 @@ Premium subscription offering.
 
 Status:
 
-Coming Soon
+Future
 
+RideTogether currently focuses only on Ride mode.
 
-Reach is a future journey mode.
-
-Reach is not part of the MVP.
-
-Current MVP priority:
-
-Authentication
-
-↓
-
-Profiles
-
-↓
-
-Ride System
-
-↓
-
-Live Tracking
-
-↓
-
-Navigation
-
+Reach is not part of MVP.
 
 ---
 
 # Journey Architecture
 
-Future Journey structure:
+Future structure:
 
+```
 Journey
 
-- Ride
-- Reach
+├── Ride
 
+└── Reach
+```
 
-Journey represents a shared movement activity.
+A Journey represents shared movement.
 
+Future shared capabilities:
 
-Future shared Journey capabilities:
+* Members
+* Destination
+* Location tracking
+* Map visualization
+* Status
+* Notifications
+* Chat
+* Events
+* History
 
-- Members
-- Destination
-- Location tracking
-- Map visualization
-- Status
-- Notifications
-- Chat
-- Events
-- History
-
-
-Future implementation may use:
-
-features/journey/
-
-
-Do not restructure the project for Reach before MVP completion.
-
+Do not restructure the application for Journey until MVP completion.
 
 ---
 
@@ -512,35 +589,29 @@ Do not restructure the project for Reach before MVP completion.
 
 Current core feature.
 
-
 Purpose:
 
 Travel together.
-
 
 Experience:
 
 Follow the leader.
 
-
 Control:
 
 Leader controlled.
 
+Capabilities:
 
-Features:
-
-- Leader
-- Route control
-- Checkpoints
-- Regroup commands
-- Group synchronization
-
+* Leader
+* Route control
+* Checkpoints
+* Regroup commands
+* Group synchronization
 
 Example:
 
 "Follow me to the mountain viewpoint."
-
 
 ---
 
@@ -548,115 +619,100 @@ Example:
 
 Future feature.
 
-
 Purpose:
 
 Meet at a destination.
-
 
 Experience:
 
 Everyone travels independently.
 
-
 Control:
 
 No leader.
 
+Capabilities:
 
-Features:
-
-- Create Reach destination
-- Join Reach
-- Shared destination
-- Live participant locations
-- Arrival detection
-- Rider progress
-- ETA
-- Completion status
-
+* Shared destination
+* Individual navigation
+* Arrival tracking
+* Participant progress
 
 Example:
 
 "Everyone meet at this café."
 
-
 ---
 
 # MVP Checklist
 
-- Authentication
-- User profiles
-- Home map shell
-- Create Ride
-- Join Ride
-- Google Maps
-- Live tracking
-- Destination sharing
-- Navigation
-- Checkpoints
-- Ride chat
-- Notifications
+Current MVP goals:
 
+* Authentication ✅
+* Rider profiles ✅
+* Home application shell ✅
+* Map foundation
+* Create Ride
+* Join Ride
+* Google Maps
+* Live tracking
+* Destination sharing
+* Navigation
+* Checkpoints
+* Ride communication
+* Notifications
 
 ---
 
 # Version Roadmap
 
-
 ## v0.1 — User Foundation
 
-Target:
+Completed:
 
-- Authentication complete
-- User profile
-- Home map shell
-
-
----
-
-## v0.2 — Ride Foundation
-
-Target:
-
-- Create Ride
-- Join Ride
-- Ride permissions
-
+* Authentication
+* Rider identity
+* Application shell
 
 ---
 
-## v0.3 — Live Ride Experience
+## v0.2 — Map Foundation
 
-Target:
+Current target:
 
-- Live tracking
-- Map integration
-- Navigation foundation
-
-
----
-
-## v0.4 — Group Ride Features
-
-Target:
-
-- Checkpoints
-- Notifications
-- Ride communication
-
+* Google Maps integration
+* Location permissions
+* Map screen
 
 ---
 
-## v0.5 — Advanced Ride Features
+## v0.3 — Ride Foundation
 
 Target:
 
-- Regroup
-- Leader controls
-- Ride history
-- Statistics
+* Create Ride
+* Join Ride
+* Ride permissions
 
+---
+
+## v0.4 — Live Ride Experience
+
+Target:
+
+* Live tracking
+* Map integration
+* Navigation foundation
+
+---
+
+## v0.5 — Group Ride Features
+
+Target:
+
+* Checkpoints
+* Notifications
+* Ride communication
 
 ---
 
@@ -664,10 +720,9 @@ Target:
 
 Target:
 
-- Android release
-- iOS release
-- Motorcycle-focused experience
-
+* Android release
+* iOS release
+* Motorcycle-focused experience
 
 ---
 
