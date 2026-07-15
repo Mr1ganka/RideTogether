@@ -1,6 +1,6 @@
 ﻿# RideTogether AI Development Instructions
 
-Version: 1.4
+Version: 1.5
 
 ---
 
@@ -66,7 +66,7 @@ Important principles:
 ## Version
 
 ```
-v0.0.3 — Rider Identity Foundation
+v0.0.4 — Map Foundation
 ```
 
 ---
@@ -163,7 +163,7 @@ Application State
 
 ---
 
-# Rider Identity System
+## Rider Identity System
 
 Completed:
 
@@ -220,13 +220,13 @@ Firestore structure:
 ```
 users
 
- └── {userId}
+  └── {userId}
 
-      ├── displayName
-      ├── email
-      ├── photoUrl
-      ├── createdAt
-      └── updatedAt
+        ├── displayName
+        ├── email
+        ├── photoUrl
+        ├── createdAt
+        └── updatedAt
 ```
 
 Future rider profile additions:
@@ -707,4 +707,271 @@ domain/
 
 presentation/
 ```
+
 Reach should only be implemented after current MVP priorities are complete.
+
+---
+
+# 12. Mapping Architecture & Setup
+
+RideTogether uses a provider-agnostic mapping architecture. The current implementation uses **OpenStreetMap** via the `flutter_map` package, but the application is designed so that the underlying map provider can be replaced (Google Maps, Mapbox, HERE, etc.) without affecting business logic.
+
+**Maps and Location are separate features.** The map feature handles rendering, camera, markers, and polylines. The location feature handles GPS, permissions, and geocoding.
+
+### Current Map Stack
+
+The following packages are used for the OpenStreetMap implementation:
+
+| Package | Purpose |
+|---------|---------|
+| `flutter_map` | Map widget for rendering tiles and overlays |
+| `latlong2` | Geographic coordinate handling (LatLng) |
+
+### Current Location Stack
+
+The following packages are used for location services:
+
+| Package | Purpose |
+|---------|---------|
+| `geolocator` | Device GPS location access |
+| `geocoding` | Address ↔ coordinate conversion |
+| `permission_handler` | Runtime permission management |
+| `flutter_google_places_sdk` | Places API integration (future) |
+| `flutter_polyline_points` | Route polyline decoding |
+
+These are implementation details behind the `MapProvider` and `LocationRepository` abstractions. Application code should depend on the provider interfaces, not directly on `flutter_map`, `geolocator`, or provider-specific APIs.
+
+### Feature Structure
+
+Instead of a combined map repository, the architecture defines two independent feature areas:
+
+```
+features/
+  map/
+    data/
+      - models/
+      - repositories/
+      - datasources/
+    domain/
+      - entities/
+      - repositories/
+      - mappers/
+    presentation/
+      - screens/
+      - widgets/
+      - providers/
+  location/
+    data/
+      - models/
+      - repositories/
+      - datasources/
+    domain/
+      - entities/
+      - repositories/
+      - mappers/
+    presentation/
+      - screens/
+      - widgets/
+      - providers/
+```
+
+The **map feature** is responsible for:
+- Rendering maps
+- Camera movement
+- Markers
+- Polylines
+- Tile providers
+- Map interactions
+
+The **location feature** is responsible for:
+- GPS
+- Location permissions
+- Current position
+- Continuous location updates
+- Reverse geocoding
+
+### Map Dependencies (Already Added)
+
+The following packages are already in `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  geolocator: ^14.0.2
+  permission_handler: ^12.0.1
+  geocoding: ^4.0.0
+  flutter_google_places_sdk: ^0.4.2
+  flutter_polyline_points: ^3.0.1
+```
+
+Run `flutter pub get` if not already done.
+
+### Platform Configuration
+
+#### Android
+Add location permissions to `android/app/src/main/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+```
+
+#### iOS
+Add location usage descriptions to `ios/Runner/Info.plist`:
+
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>RideTogether needs location access to show your position on the map during rides.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>RideTogether needs location access for live rider tracking during group rides.</string>
+```
+
+#### Web
+No additional configuration required for `flutter_map` on web.
+
+### MapProvider Abstraction
+
+The `MapProvider` abstraction defines the contract for map operations. **Use `MapProvider` (not `MapEngine`) for consistency across documentation.**
+
+#### Core Domain Models
+
+```dart
+// Domain entities (in features/map/domain/entities/)
+class MapMarker { /* id, position, icon, label, onTap, data */ }
+class MapPolyline { /* id, points, color, width, pattern */ }
+class CameraPosition { /* target, zoom, bearing, tilt */ }
+class MapBounds { /* southwest, northeast */ }
+class LatLng { /* latitude, longitude */ }
+class MapCapabilities { /* supportsSatellite, supportsTraffic, supportsOffline, etc. */ }
+enum MapProviderType { openStreetMap, googleMaps, mapbox, here }
+```
+
+#### Core Operations
+
+**Camera Control:**
+- `moveCamera(CameraPosition position)`
+- `animateCamera(CameraPosition position, {Duration duration})`
+- `zoomIn()`
+- `zoomOut()`
+- `zoomTo(double zoom)`
+- `fitBounds(MapBounds bounds, {EdgeInsets padding})`
+- `getCameraPosition()` → `Future<CameraPosition>`
+- `cameraPositionStream` → `Stream<CameraPosition>`
+
+**Markers:**
+- `addMarker(MapMarker marker)`
+- `removeMarker(String markerId)`
+- `updateMarker(MapMarker marker)`
+- `clearMarkers()`
+- `getMarkers()` → `List<MapMarker>`
+- `onMarkerTap` → `Stream<String>` (markerId)
+- `onMarkerLongPress` → `Stream<String>`
+
+**Polylines:**
+- `addPolyline(MapPolyline polyline)`
+- `removePolyline(String polylineId)`
+- `clearPolylines()`
+- `getPolylines()` → `List<MapPolyline>`
+
+**Map Layers & Styling:**
+- `setTileLayer(TileLayerOptions options)`
+- `setMapStyle(String styleJson)` (future)
+- `enableLayer(String layerId)`
+- `disableLayer(String layerId)`
+
+**Lifecycle:**
+- `initialize()`
+- `dispose()`
+- `getCapabilities()` → `MapCapabilities`
+
+**Implementations:**
+- `FlutterMapProvider` (current: flutter_map + OpenStreetMap)
+- `GoogleMapsProvider` (future: google_maps_flutter)
+- `MapboxProvider` (future: mapbox_maps_flutter)
+- `HEREMapsProvider` (future: here_sdk)
+
+The application depends only on the `MapProvider` interface, making the underlying provider interchangeable.
+
+### LocationRepository Abstraction
+
+The `LocationRepository` abstraction defines the contract for location services:
+
+**Core Operations:**
+- `requestPermission()` → `Future<PermissionStatus>`
+- `checkPermission()` → `Future<PermissionStatus>`
+- `isPermissionGranted()` → `Future<bool>`
+- `getCurrentPosition({LocationAccuracy accuracy})` → `Future<Position>`
+- `getPositionStream({LocationAccuracy accuracy, DistanceFilter distanceFilter})` → `Stream<Position>`
+- `getLastKnownPosition()` → `Future<Position?>`
+- `getAddressFromCoordinates(double lat, double lng)` → `Future<List<Placemark>>`
+- `getCoordinatesFromAddress(String address)` → `Future<List<Location>>`
+- `openAppSettings()` → `Future<bool>`
+- `openLocationSettings()` → `Future<bool>`
+
+**Implementations:**
+- `GeolocatorLocationRepository` (current: wraps geolocator package)
+- Alternative GPS providers (future)
+- Mock implementations for testing (future)
+
+### Provider Abstraction Benefits
+
+1. **Vendor Independence** - No lock-in to Google Maps billing, terms, or API changes
+2. **Cost Control** - OpenStreetMap is free and open-source
+3. **Offline Capability** - Easier to implement offline map tiles with OSM
+4. **Customization** - Full control over map styling and layers
+5. **Future Flexibility** - Can swap to Google Maps/Mapbox when needed for specific features (Street View, advanced routing, etc.)
+
+### Google Maps (Future Provider)
+
+Google Maps remains a possible future provider. The architecture intentionally avoids vendor lock-in. If Google Maps is needed later (e.g., for Street View, advanced routing, or Places API):
+
+1. Create a `GoogleMapsProvider` implementing the `MapProvider` interface
+2. Add `google_maps_flutter` dependency
+3. Configure API keys in `AndroidManifest.xml` and `Info.plist`
+4. Update the provider registration
+5. No changes required to ride coordination, live tracking, or UI layers
+
+Do not add Google Maps API keys or configuration until the provider is actually implemented.
+
+### Mapbox (Future Provider)
+
+Similar to Google Maps, Mapbox can be implemented as a `MapProvider` when needed for specific features.
+
+### HERE Maps (Future Provider)
+
+HERE Maps can be implemented as a `MapProvider` when needed for specific features.
+
+### Implementation Phases (from TODO_MAP_FOUNDATION.md)
+
+The Map Foundation is implemented in 16 phases:
+
+| Phase | Description | Key Deliverables |
+|-------|-------------|------------------|
+| 1 | Foundation & MapProvider Abstraction | Feature structure, interfaces, domain models |
+| 2 | Camera & Viewport Control | FlutterMapProvider, camera operations, stream |
+| 3 | Markers & Overlays | Marker CRUD, clustering-ready, callbacks |
+| 4 | Polylines & Routes | Polyline operations, route rendering |
+| 5 | AppMap Widget & Providers | AppMap widget, Riverpod providers, error handling |
+| 6 | LocationRepository & Location Feature | GeolocatorLocationRepository, permissions, geocoding |
+| 7 | MapScreen & UI Integration | MapScreen, toolbar, providers, error states |
+| 8 | Map Persistence & Preferences | Map preferences, cached tile layer, persistence |
+| 9 | Map Event System | MapEvent, EventBus, lifecycle events |
+| 10 | Map Styling & Tile Layers | Tile layer config, satellite/terrain, custom styles |
+| 11 | Offline Map Support | Tile caching, offline-first, background download |
+| 12 | Advanced Map Interactions | Gestures, distance/area measurement, clustering |
+| 13 | Map Performance & Optimization | Viewport culling, level-of-detail, frame budget |
+| 14 | Map Testing Infrastructure | Mock provider, golden tests, integration tests |
+| 15 | Ride Visualization on Map | Rider markers, route overlay, leader/follower UI |
+| 16 | Future Map Layers | TrafficLayer, RoutingLayer (future) |
+
+### Future Providers Placeholder
+
+The following Riverpod providers are reserved for future implementation and should not be implemented yet:
+
+- `nearbyRidersProvider`
+- `selectedDestinationProvider`
+- `activeRouteProvider`
+
+These will be added when the ride coordination features require them.

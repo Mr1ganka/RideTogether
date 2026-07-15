@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/entities/camera_position.dart';
+import '../../domain/entities/geo_point.dart';
+import '../../domain/entities/map_marker.dart';
+import '../../domain/entities/map_polyline.dart';
+import '../providers/map_engine_provider.dart';
+
+
+class AppMap extends ConsumerWidget {
+
+  const AppMap({
+    super.key,
+    this.initialCamera,
+    this.markers = const [],
+    this.polylines = const [],
+  });
+
+
+  final CameraPosition? initialCamera;
+
+  final List<MapMarker> markers;
+
+  final List<MapPolyline> polylines;
+
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final mapEngine =
+        ref.watch(mapEngineProvider);
+
+
+    return mapEngine.buildMap(
+      initialCamera:
+          initialCamera ??
+          const CameraPosition(
+            target: GeoPoint(
+              latitude: 0,
+              longitude: 0,
+            ),
+            zoom: 2,
+          ),
+
+      markers: markers,
+
+      polylines: polylines,
+    );
+  }
+}
