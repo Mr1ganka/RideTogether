@@ -8,8 +8,8 @@ import 'location_repository_provider.dart';
 final initialPositionProvider =
     FutureProvider<PositionEntity?>((ref) async {
 
-  final permission =
-      await ref.watch(locationPermissionProvider.future);
+  //final permission =
+    await ref.watch(locationPermissionProvider.future);
 
 
   final repository =

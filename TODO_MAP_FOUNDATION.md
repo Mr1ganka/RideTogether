@@ -462,14 +462,18 @@ FlutterMap()
 
 # Phase 6 — Location Feature Foundation
 
-TODO
+## Status: Completed
 
-The first integration after map rendering is connecting device location to the map.
+The first map integration milestone is connecting device location to the map.
 
-The purpose of this phase is to prove the complete flow:
+The complete flow is now working:
 
 ```
 Device GPS
+
+    |
+
+Geolocator
 
     |
 
@@ -481,20 +485,24 @@ PositionEntity
 
     |
 
-Map Marker
+User Marker
 
     |
 
 AppMap
+
+    |
+
+FlutterMap/OpenStreetMap
 ```
 
-The location feature is independent from map rendering.
+The location feature remains independent from map rendering.
 
-The map should only receive location data and display it.
+The map receives location data and displays it.
 
 ---
 
-## Location Feature Structure
+# Location Feature Structure
 
 ```
 features/
@@ -506,9 +514,9 @@ location/
         repositories/
             geolocator_location_repository.dart
 
-        models/
-
-        datasources/
+        mappers/
+            position_mapper.dart
+            permission_mapper.dart
 
 
     domain/
@@ -525,18 +533,19 @@ location/
     presentation/
 
         providers/
+
             location_permission_provider.dart
             current_position_provider.dart
-            location_stream_provider.dart
+            initial_position_provider.dart
 ```
 
 ---
 
 # Phase 7 — Location Repository Interface
 
-TODO
+## Status: Completed
 
-Create:
+Created:
 
 ```
 LocationRepository
@@ -548,37 +557,8 @@ Responsibilities:
 * Check permissions
 * Fetch current position
 * Stream position updates
-* Reverse geocode coordinates
-* Forward geocode addresses
 
-Interface:
-
-```dart
-abstract class LocationRepository {
-
-  Future<PermissionStatusEntity> requestPermission();
-
-  Future<PermissionStatusEntity> checkPermission();
-
-  Future<bool> isPermissionGranted();
-
-  Future<PositionEntity?> getCurrentPosition({LocationAccuracy accuracy});
-
-  Stream<PositionEntity> getPositionStream({LocationAccuracy accuracy, DistanceFilter distanceFilter});
-
-  Future<PositionEntity?> getLastKnownPosition();
-
-  Future<List<Placemark>> getAddressFromCoordinates(double lat, double lng);
-
-  Future<List<Location>> getCoordinatesFromAddress(String address);
-
-  Future<bool> openAppSettings();
-
-  Future<bool> openLocationSettings();
-}
-```
-
-The interface must not depend on:
+The interface does not depend on:
 
 * geolocator
 * Android APIs
@@ -586,18 +566,11 @@ The interface must not depend on:
 
 ---
 
-# Phase 7 Tests
-
-[ ] Contract test: LocationRepository interface compiles
-[ ] Mock test: MockLocationRepository implements all methods
-
----
-
 # Phase 8 — Geolocator Implementation
 
-TODO
+## Status: Completed
 
-Create:
+Created:
 
 ```
 GeolocatorLocationRepository
@@ -606,7 +579,7 @@ GeolocatorLocationRepository
 Responsibilities:
 
 * Wrap geolocator package
-* Handle permissions
+* Handle GPS access
 * Convert platform models into domain entities
 
 Flow:
@@ -616,152 +589,198 @@ Geolocator Position
 
         |
 
-Mapper
+PositionMapper
 
         |
 
 PositionEntity
 ```
 
-Handle:
+Implemented:
 
-* Permission denied
-* Permission permanently denied
-* GPS disabled
-* Location unavailable
+[x] getCurrentPosition()
 
----
+[x] getPositionStream()
 
-# Phase 8 Tests
+[x] PositionEntity mapping
 
-[ ] Unit test: Permission request returns correct status
-[ ] Unit test: getCurrentPosition returns PositionEntity
-[ ] Unit test: getPositionStream emits PositionEntity
-[ ] Unit test: Geocoding returns Placemark/Location entities
-[ ] Unit test: Handles permission denied gracefully
-[ ] Unit test: Handles GPS disabled gracefully
-[ ] Integration test: GeolocatorLocationRepository on device
+[x] Permission abstraction
 
 ---
 
 # Phase 9 — Location Riverpod Providers
 
-TODO
+## Status: Completed
 
-Create:
+Implemented:
 
 ```
 locationPermissionProvider
 
 currentPositionProvider
 
-locationStreamProvider
+initialPositionProvider
 ```
 
 Responsibilities:
 
-## locationPermissionProvider
-
-Tracks:
-
-* unknown
-* granted
-* denied
-* permanently denied
-
 ## currentPositionProvider
 
-Provides:
+Provides continuous GPS updates:
+
+```
+Stream<PositionEntity>
+```
+
+Used for:
+
+* Live user movement
+* Rider tracking
+* Future active ride tracking
+
+
+## initialPositionProvider
+
+Provides initial camera position:
 
 ```
 PositionEntity?
 ```
 
-for one-time location fetches.
+Used for:
 
-## locationStreamProvider
-
-Provides continuous updates:
-
-```
-PositionEntity stream
-```
-
-for moving users.
-
----
-
-# Phase 9 Tests
-
-[ ] Provider test: locationPermissionProvider state transitions
-[ ] Provider test: currentPositionProvider returns position
-[ ] Provider test: locationStreamProvider emits stream
-[ ] Integration test: Providers work with GeolocatorLocationRepository
+* Initial map centering
 
 ---
 
 # Phase 10 — User Location Layer
 
-TODO
+## Status: Completed
 
-Add user location as a map layer.
+The user location layer is now implemented.
 
-Updated map layers:
+Current behaviour:
+
+```
+GPS update
+
+    |
+
+PositionEntity
+
+    |
+
+MapMarker
+
+    |
+
+MarkerLayer
+
+    |
+
+User location displayed
+```
+
+Implemented:
+
+[x] Current location marker
+
+[x] Marker updates from GPS stream
+
+[x] Live position updates
+
+Future:
+
+[ ] Accuracy circle
+
+[ ] Heading indicator
+
+[ ] Direction arrow
+
+[ ] Follow-user camera mode
+
+---
+
+# Current Map Architecture
+
+Current runtime flow:
+
+```
+HomeScreen
+
+    |
+
+AppMap
+
+    |
+
+MapEngine Interface
+
+    |
+
+FlutterMapEngine
+
+    |
+
+flutter_map
+
+    |
+
+OpenStreetMap
+```
+
+
+Location flow:
+
+```
+Phone GPS
+
+    |
+
+GeolocatorLocationRepository
+
+    |
+
+currentPositionProvider
+
+    |
+
+userMarkerProvider
+
+    |
+
+AppMap markers
+
+    |
+
+FlutterMap MarkerLayer
+```
+
+---
+
+# Map UI Direction
+
+The application follows a map-first approach.
+
+The map is the primary workspace.
+
+Other features will appear as overlays:
 
 ```
 Map
 
-  |
-  +-- Tile Layer
-  +-- User Location Layer
-  +-- Rider Marker Layer
-  +-- Route Layer
-  +-- Traffic Layer (future)
-  +-- Controls Layer
+ |
+
+ + Floating Controls
+
+ + Navigation Panels
+
+ + Ride Information Panels
+
+ + Profile Panels
 ```
 
-Responsibilities:
-
-* Display current user position
-* Show accuracy circle
-* Update marker as location changes
-
-Future:
-
-* Direction arrow
-* Heading indicator
-* Follow-user camera mode
-
----
-
-# Phase 10 Tests
-
-[ ] Widget test: UserLocationLayer displays marker
-[ ] Widget test: Accuracy circle renders correctly
-[ ] Widget test: Marker updates on position stream
-[ ] Integration test: UserLocationLayer with locationStreamProvider
-
----
-
-# Phase 11 — Map Screen Architecture
-
-TODO
-
-After location integration is working, create the map-first application shell.
-
-Create:
-
-```
-MapScreen
-```
-
-Responsibilities:
-
-* Own the map experience
-* Host map overlays
-* Coordinate map UI state
-
-Structure:
+The homepage will eventually become:
 
 ```
 MapScreen
@@ -774,29 +793,68 @@ MapScreen
 
     +----------------+
     |                |
-    |     AppMap     |
+    |      Map       |
     |                |
     +----------------+
 
-    |
-
-    + MapControls
-
-    + NavigationPanel
-
-    + RideInformationPanel
+    Floating Buttons
 ```
-
-The map becomes the primary authenticated experience.
 
 ---
 
-# Phase 11 Tests
+# Next Implementation Phase
 
-[ ] Widget test: MapScreen renders AppMap
-[ ] Widget test: MapScreen stacks controls over map
-[ ] Integration test: MapScreen with MapMode providers
-[ ] Integration test: MapScreen with UserLocationLayer
+# Phase 11 — Camera Controls and Map Interaction
+
+## Status: Next
+
+The next goal is making the map behave like a navigation application.
+
+Features:
+
+[x] Display user location
+
+Next:
+
+[ ] Add MapEngine camera control abstraction
+
+[ ] Add moveCamera()
+
+[ ] Add zoomIn()
+
+[ ] Add zoomOut()
+
+[ ] Add centerOnUser()
+
+[ ] Add floating map controls
+
+[ ] Add recenter button
+
+
+Architecture:
+
+```
+UI
+
+ |
+
+MapEngine
+
+ |
+
+FlutterMapEngine
+
+ |
+
+MapController
+```
+
+
+The UI must never directly access:
+
+```
+flutter_map MapController
+```
 
 ---
 
@@ -804,47 +862,19 @@ The map becomes the primary authenticated experience.
 
 TODO
 
-Create floating controls based on map mode.
+Controls will depend on MapMode.
 
 ## Idle Mode
 
-User has no active ride.
+User has not joined a ride.
 
 Controls:
 
 * Join Ride
-* Create Ride (future)
 * Profile
 * My Rides
 * Settings
 
-Example:
-
-```
-             MAP
-
-
-              👤
-
-
-        +-------------+
-        | Join Ride   |
-        +-------------+
-```
-
----
-
-## Searching Ride Mode
-
-User is looking for a ride to join.
-
-Controls:
-
-* Cancel search
-* Filter options
-* My location
-
----
 
 ## Active Ride Mode
 
@@ -854,168 +884,57 @@ Controls:
 
 * Recenter location
 * Show riders
-* Ride information
 * Route options
+* Ride information
 
----
 
 ## Navigation Mode
-
-User is navigating to a destination.
 
 Controls:
 
 * Recenter
 * Next turn preview
-* Mute guidance
-* End navigation
-
----
-
-## Ride Completed Mode
-
-Ride has finished.
-
-Controls:
-
-* View ride summary
-* Save ride
-* Share ride
-* New ride
-
----
-
-# Phase 12 Tests
-
-[ ] Widget test: Idle mode controls render
-[ ] Widget test: Active ride controls render
-[ ] Widget test: Navigation mode controls render
-[ ] Widget test: Ride completed controls render
-[ ] Widget test: Controls react to MapMode changes
-
----
-
-# Phase 13 — Map Mode State
-
-TODO
-
-Create:
-
-```
-mapModeProvider
-```
-
-Initial states:
-
-```dart
-enum MapMode {
-
-  idle,
-
-  activeRide,
-
-  searchingRide,
-
-  navigation,
-
-  rideCompleted,
-}
-```
-
-Controls and overlays react to map mode.
-
----
-
-# Phase 13 Tests
-
-[ ] Provider test: mapModeProvider initial state is idle
-[ ] Provider test: State transitions work correctly
-[ ] Integration test: MapMode controls update on state change
-
----
-
-# Phase 14 — Active Ride Map
-
-TODO
-
-When a user joins a ride, display:
-
-* Destination marker
-* User location
-* Rider markers
-* Route polyline
 * ETA
-* Next navigation instruction
+* Route options
 
-Example:
-
-```
-+--------------------------+
-
-Turn right in 250m
-
-ETA 18 min
-
-+--------------------------+
-
-
-          👤
-
-
-========== Route ==========
-
-
-          📍 Destination
-```
 
 ---
 
-# Phase 14 Tests
-
-[ ] Widget test: Active ride map shows destination marker
-[ ] Widget test: Rider markers display correctly
-[ ] Widget test: Route polyline renders
-[ ] Widget test: ETA and turn instruction display
-[ ] Integration test: Active ride map with live rider data
-
----
-
-# Phase 15 — Rider Visualization
+# Phase 13 — Follow User Mode
 
 TODO
 
-Display other riders on the map.
+Add optional camera following.
+
+Behaviour:
 
 Default:
 
 ```
-Show rider markers
+Marker moves
+
+Camera remains where user left it
 ```
 
-Optional:
+
+User presses:
 
 ```
-Select rider
-
-        |
-
-Show route to rider
+[Center Location]
 ```
 
-Avoid displaying every rider route simultaneously to prevent map clutter.
+Then:
+
+```
+Camera follows user
+```
+
+
+This avoids preventing users from exploring the map manually.
 
 ---
 
-# Phase 15 Tests
-
-[ ] Widget test: Rider markers display with rider info
-[ ] Widget test: Selected rider shows route to them
-[ ] Performance test: Multiple rider markers (10+) render smoothly
-[ ] Integration test: Rider markers update from live location stream
-
----
-
-# Phase 16 — Future Map Layers
+# Future Map Features
 
 ## Traffic Layer
 
@@ -1033,11 +952,10 @@ Responsibilities:
 
 Should not require changes to:
 
-* MapProvider
+* MapEngine
 * MapScreen
 * Ride features
 
----
 
 ## Routing Layer
 
@@ -1049,55 +967,37 @@ RouteRepository
 
 Responsibilities:
 
-* Calculate routes
+* Route calculation
 * ETA
-* Turn instructions
+* Turn-by-turn instructions
 
 The map only renders route results.
 
 ---
 
-# Reserved Riverpod Providers (Future)
+# Current Next Task
 
-The following providers are reserved for future implementation and should not be implemented yet:
-
-- `nearbyRidersProvider` - Live nearby rider positions
-- `selectedDestinationProvider` - User-selected destination
-- `activeRouteProvider` - Currently active navigation route
-
-These will be added when the ride coordination features require them.
-
----
-
-# Updated Next Task
-
-Current status:
+Completed:
 
 [x] Map abstraction
 
-[x] FlutterMapProvider
+[x] FlutterMapEngine
 
 [x] OpenStreetMap rendering
 
 [x] AppMap widget
 
-Next implementation:
+[x] LocationRepository abstraction
 
-**Phase 6 — Create LocationRepository interface and location feature foundation.**
+[x] Geolocator implementation
 
----
+[x] Permission flow
 
-# Terminology Migration Checklist
+[x] Current location stream
 
-The following files need to be renamed from `MapEngine` to `MapProvider` terminology:
+[x] Live user marker
 
-[ ] `lib/features/map/domain/engine/map_engine.dart` → `map_provider.dart`
-[ ] `lib/features/map/data/engines/flutter_map_engine.dart` → `flutter_map_provider.dart`
-[ ] `lib/features/map/presentation/providers/map_engine_provider.dart` → `map_provider_provider.dart`
-[ ] Update all imports and references throughout codebase
-[ ] Update TODO_MAP_FOUNDATION.md (this file) - DONE
-[ ] Update architecture.md
-[ ] Update instructions.md
-[ ] Update roadmap.md
-[ ] Update localsetup.md
-[ ] Update RideTogether Project Context.md
+
+Next:
+
+**Phase 11 — Camera Controls and Map Interaction**

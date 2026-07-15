@@ -5,11 +5,7 @@ import '../../domain/entities/position_entity.dart';
 import '../../domain/repositories/location_repository.dart';
 import '../../data/mapper/position_mapper.dart';
 
-
-class GeolocatorLocationRepository 
-    implements LocationRepository {
-
-
+class GeolocatorLocationRepository implements LocationRepository {
   @override
   Future<PositionEntity?> getCurrentPosition() async {
     final position = await Geolocator.getCurrentPosition();
@@ -17,51 +13,46 @@ class GeolocatorLocationRepository
     return PositionMapper.toEntity(position);
   }
 
-
   @override
   Stream<PositionEntity> getPositionStream() {
-    return Geolocator.getPositionStream().map(
-      PositionMapper.toEntity,
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 3,
     );
+
+    return Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).map(PositionMapper.toEntity);
   }
 
   @override
   Future<PermissionStatusEntity> checkPermission() async {
-
-    final serviceEnabled =
-        await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
       return PermissionStatusEntity.serviceDisabled;
     }
 
-    final permission =
-        await Geolocator.checkPermission();
+    final permission = await Geolocator.checkPermission();
 
     return _mapPermission(permission);
   }
 
   @override
   Future<PermissionStatusEntity> requestPermission() async {
-
-    final serviceEnabled =
-        await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!serviceEnabled) {
       return PermissionStatusEntity.serviceDisabled;
     }
 
-    final permission =
-        await Geolocator.requestPermission();
+    final permission = await Geolocator.requestPermission();
 
     return _mapPermission(permission);
   }
 
-  PermissionStatusEntity _mapPermission(
-      LocationPermission permission,
-  ) {
+  PermissionStatusEntity _mapPermission(LocationPermission permission) {
     switch (permission) {
-
       case LocationPermission.always:
       case LocationPermission.whileInUse:
         return PermissionStatusEntity.granted;
