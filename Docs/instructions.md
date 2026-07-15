@@ -549,7 +549,7 @@ Theme.of(context)
 
 Development order:
 
-1. Complete map foundation
+1. Complete map foundation (Phases 1-10 Complete, Phase 11 Next)
 2. Integrate location permissions
 3. Create map experience
 4. Create Ride feature
@@ -558,7 +558,6 @@ Development order:
 
 Do not jump into advanced features before MVP foundations are complete.
 
----
 
 # Future Journey Architecture
 

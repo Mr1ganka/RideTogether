@@ -510,5 +510,5 @@ No CI/CD pipeline configured yet.
 1. Run `flutter pub get`
 2. Run `flutter run` on device/emulator
 3. Verify Google Sign-In works
-4. Verify map loads (when Phase 2 MapScreen is implemented)
-5. Verify location permissions work (when Phase 2 Location is implemented)
+4. Verify map loads (Map Foundation Phases 1-5 complete, MapScreen in Phase 7)
+5. Verify location permissions work (Location Foundation Phases 6-10 complete, User Location Layer in Phase 10)

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:ride_together/features/map/domain/entities/map_theme.dart';
 
 import '../entities/camera_position.dart';
 import '../entities/map_marker.dart';
@@ -10,7 +11,6 @@ abstract interface class MapEngine {
     required CameraPosition initialCamera,
     required List<MapMarker> markers,
     required List<MapPolyline> polylines,
-    // void Function(GeoPoint point)? onTap,
-    // void Function(CameraPosition camera)? onCameraMove,
+    required MapTheme theme,
   });
 }

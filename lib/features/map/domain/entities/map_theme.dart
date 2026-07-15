@@ -1,0 +1,4 @@
+enum MapTheme {
+  light,
+  dark,
+}

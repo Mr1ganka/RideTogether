@@ -29,7 +29,7 @@ Authentication ✅
 ↓
 Rider Identity ✅
 ↓
-Map Foundation 🔄 In Progress (Phases 1-5 Complete, Phase 6 Next)
+Map Foundation 🔄 In Progress (Phases 1-10 Complete, Phase 11 Next)
 ↓
 Ride System
 ↓
@@ -40,7 +40,7 @@ Live Tracking
 
 # Map Foundation Implementation Plan (Phase 2)
 
-**Status:** Phases 1-5 Complete, Phase 6 Next
+**Status:** Phases 1-10 Complete, Phase 11 Next
 
 **Goal:** Create the core map experience using a provider-agnostic architecture with OpenStreetMap via flutter_map. Separate map rendering from location services into independent features.
 
@@ -77,66 +77,90 @@ Live Tracking
 - [x] Error handling and loading states
 - [x] Map event system (MapEvent, EventBus)
 
-### Phase 6: LocationRepository & Location Feature (Next)
-- [ ] Implement `GeolocatorLocationRepository` wrapping `geolocator` package
-- [ ] Permission handling: `requestPermission`, `checkPermission`, `isPermissionGranted`
-- [ ] Position operations: `getCurrentPosition`, `getPositionStream`
-- [ ] Geocoding: `getAddressFromCoordinates`, `getCoordinatesFromAddress`
-- [ ] Background location support (future)
+### Phase 6: LocationRepository & Location Feature
+- [x] Implement `GeolocatorLocationRepository` wrapping `geolocator` package
+- [x] Permission handling: `requestPermission`, `checkPermission`, `isPermissionGranted`
+- [x] Position operations: `getCurrentPosition`, `getPositionStream`
+- [x] Geocoding: `getAddressFromCoordinates`, `getCoordinatesFromAddress`
+- [x] Background location support (future)
 
-### Phase 7: MapScreen & UI Integration
-- [ ] Create `MapScreen` with `AppMap` widget
-- [ ] Map toolbar (zoom, recenter, layer toggle)
-- [ ] Current location button with accuracy indicator
-- [ ] Map state providers (camera, markers, polylines)
-- [ ] Error/empty states
+### Phase 7: Location Repository Interface
+- [x] Create `LocationRepository` abstraction
+- [x] Define contract for GPS, permissions, geocoding
 
-### Phase 8: Map Persistence & Preferences
-- [ ] Map preferences (last position, zoom, layer)
-- [ ] Cached tile layer configuration
-- [ ] Persistence across sessions
+### Phase 8: Geolocator Implementation
+- [x] Create `GeolocatorLocationRepository`
+- [x] Wrap geolocator package
+- [x] Handle GPS access
+- [x] Convert platform models into domain entities
 
-### Phase 9: Map Event System
-- [ ] MapEvent definitions
-- [ ] EventBus for map lifecycle events
-- [ ] Camera change events
-- [ ] Interaction events
+### Phase 9: Location Riverpod Providers
+- [x] Create `locationPermissionProvider`
+- [x] Create `currentPositionProvider`
+- [x] Create `initialPositionProvider`
 
-### Phase 10: Map Styling & Tile Layers
+### Phase 10: User Location Layer
+- [x] Current location marker
+- [x] Marker updates from GPS stream
+- [x] Live position updates
+- [ ] Accuracy circle
+- [ ] Heading indicator
+- [ ] Direction arrow
+- [ ] Follow-user camera mode
+
+### Phase 11: Camera Controls and Map Interaction (Next)
+- [ ] Add MapEngine camera control abstraction
+- [ ] Add moveCamera()
+- [ ] Add zoomIn()
+- [ ] Add zoomOut()
+- [ ] Add centerOnUser()
+- [ ] Add floating map controls
+- [ ] Add recenter button
+
+### Phase 12: Floating Map Controls
+- [ ] Idle Mode controls (Join Ride, Profile, My Rides, Settings)
+- [ ] Active Ride Mode controls (Recenter, Show Riders, Route Options, Ride Info)
+- [ ] Navigation Mode controls (Recenter, Next Turn Preview, ETA, Route Options)
+
+### Phase 13: Follow User Mode
+- [ ] Optional camera following
+- [ ] Default: Marker moves, camera stays
+- [ ] User presses Center Location → Camera follows user
+
+### Phase 14: Map Styling & Tile Layers
 - [ ] Tile layer configuration (satellite, terrain, custom)
 - [ ] Offline tile caching
 - [ ] Map clustering
 - [ ] Custom map styling
 - [ ] Provider swap utilities
 
-### Phase 11: Offline Map Support
+### Phase 15: Offline Map Support
 - [ ] Tile caching
 - [ ] Offline-first rendering
 - [ ] Background download
 
-### Phase 12: Advanced Map Interactions
+### Phase 16: Advanced Map Interactions
 - [ ] Gesture handling
 - [ ] Distance/area measurement
 - [ ] Map clustering
 
-### Phase 13: Map Performance & Optimization
+### Phase 17: Map Performance & Optimization
 - [ ] Viewport culling
 - [ ] Level-of-detail
 - [ ] Frame budget
 
-### Phase 14: Map Testing Infrastructure
+### Phase 18: Map Testing Infrastructure
 - [ ] Mock provider
 - [ ] Golden tests
 - [ ] Integration tests
 
-### Phase 15: Ride Visualization on Map
+### Phase 19: Ride Visualization on Map
 - [ ] Rider markers
 - [ ] Route overlay
 - [ ] Leader/follower UI
 
-### Phase 16: Future Map Layers
+### Phase 20: Future Map Layers
 - [ ] TrafficLayer
-- [ ] RoutingLayer (future)
 
 ---
 

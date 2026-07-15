@@ -10,7 +10,6 @@ import '../../../../features/location/presentation/providers/location_permission
 import '../../../../features/map/domain/entities/camera_position.dart';
 import '../../../../features/map/domain/entities/geo_point.dart';
 import '../../../../features/map/presentation/widgets/app_map.dart';
-// import '../../../../features/map/domain/entities/map_marker.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
