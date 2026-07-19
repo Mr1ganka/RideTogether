@@ -13,6 +13,7 @@ class PositionMapper {
       altitude: position.altitude,
       heading: position.heading,
       speed: position.speed,
+      timestamp: position.timestamp,
     );
   }
 }

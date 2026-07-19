@@ -1,116 +1,122 @@
 # RideTogether Project Context
 
-Version: 1.5
-
-Last Updated:
-2026-07-15
+**Version:** 3.0  
+**Last Updated:** 2026-07-17
 
 ---
 
-# Purpose of This Document
+## Table of Contents
 
-This document is the primary context file for RideTogether.
+1. [Purpose](#purpose)
+2. [Product Overview](#product-overview)
+3. [Product Principles](#product-principles)
+4. [Current Development Status](#current-development-status)
+5. [Completed Features](#completed-features)
+6. [Map Foundation](#map-foundation)
+7. [Map Responsibilities](#map-responsibilities)
+8. [Location Architecture](#location-architecture)
+9. [Completed Map Features](#completed-map-features)
+10. [Architecture Overview](#architecture-overview)
+11. [Feature Structure](#feature-structure)
+12. [Important File Locations](#important-file-locations)
+13. [Development Rules](#development-rules)
+14. [Current Development Priorities](#current-development-priorities)
+15. [Roadmap Summary](#roadmap-summary)
+16. [Future Journey Architecture](#future-journey-architecture)
+17. [Ride Mode](#ride-mode)
+18. [Reach Mode](#reach-mode)
+19. [Architecture Evolution Rules](#architecture-evolution-rules)
 
-It exists so that any developer or AI assistant can understand:
+---
 
-- What RideTogether is
-- Why the project exists
+## Purpose
+
+This document is the **primary context reference** for RideTogether.
+
+Before making changes, understand:
+
+- Product direction
 - Current implementation status
-- Project architecture
-- Important file locations
-- Development rules
-- Current priorities
-- Future direction
+- Architecture rules
+- Completed features
+- Next development priorities
 
-Before making changes, read this document first.
+This document should describe the **actual system**.
 
-This document should evolve with the project.
-
-Whenever a major feature is completed:
-
-- Update the current status
-- Update architecture changes
-- Update important file locations
-- Update the next development priorities
-
-Do not allow this file to become outdated.
+Update it after major milestones.
 
 ---
 
-# Product Overview
+## Product Overview
 
-RideTogether is a mobile-first group ride management application.
+RideTogether is a mobile-first group ride coordination application.
 
-Target users:
+### Target Users
 
 - Motorcycle riders
 - Cyclists
 - Road trip groups
 - Convoys
-- Adventure groups
+- Adventure riders
 
-RideTogether is not a replacement for navigation applications.
+### Core Philosophy
 
-Navigation applications answer:
+**RideTogether is not a navigation replacement.**
 
-"How do I get there?"
+| Navigation Answers | RideTogether Answers |
+|--------------------|----------------------|
+| "How do I get there?" | "How do we get there together?" |
 
-RideTogether answers:
+The application adds a **coordination layer** on top of navigation services.
 
-"How do we get there together?"
+### Core Capabilities
 
-The application adds a coordination layer on top of navigation services.
+| Capability | Description |
+|------------|-------------|
+| Group Ride Management | Create, join, and manage group rides |
+| Rider Identity | Profile, bike info, preferences |
+| Rider Synchronization | Keep all riders coordinated |
+| Live Locations | Real-time position sharing |
+| Communication | In-ride messaging and alerts |
+| Checkpoints | Planned stops and regroup points |
+| Safety Features | Emergency alerts, off-route detection |
 
-Core capabilities:
+### Product Goal
 
-- Group ride management
-- Rider identity
-- Rider synchronization
-- Live rider locations
-- Communication
-- Safety features
-- Ride organization
-
-The product goal:
-
-Make group riding easier, safer, and more connected.
-
-Every feature must answer:
-
-> Does this make riding in a group easier or safer?
-
-If not, it should not be built.
+> Make group riding easier, safer, and more connected.
 
 ---
 
-# Product Principles
+## Product Principles
 
 RideTogether should remain:
 
-- Simple
-- Fast
-- Reliable
-- Safe
-- Distraction-free
+| Principle | Description |
+|-----------|-------------|
+| **Simple** | Intuitive interfaces that work while riding |
+| **Fast** | Responsive, minimal latency |
+| **Reliable** | Consistent behavior across conditions |
+| **Safe** | Safety-critical features take precedence |
+| **Distraction-free** | Minimal rider interaction while riding |
 
-Important principles:
+### Important Rules
 
-- The map becomes the primary experience.
-- Riders should interact with the app as little as possible while riding.
-- Controls should be usable with gloves.
-- Battery usage must be considered.
-- Network usage must be optimized.
-- Safety takes priority over unnecessary features.
+| Rule | Rationale |
+|------|-----------|
+| The map is the primary experience | Core coordination happens on the map |
+| Riders should interact minimally while riding | Safety first |
+| Controls should be easy to use while riding | Glove-friendly, large targets |
+| Battery usage matters | Long rides without charging |
+| Network usage matters | Work in poor connectivity areas |
+| Safety is more important than feature quantity | Quality over quantity |
 
 ---
 
-# Current Development Status
+## Current Development Status
 
-## Current Version
+### Current Version
 
-```
-v0.0.4 — Map Foundation
-```
+**v0.0.4 — Map Foundation Complete**
 
 ---
 
@@ -118,204 +124,355 @@ v0.0.4 — Map Foundation
 
 ### Application Foundation
 
-- Flutter project created
-- Android environment configured
-- Physical device testing verified
-- Feature-first architecture created
-- Riverpod integrated
-- GoRouter integrated
-- Google Fonts integrated
-- Material 3 theme foundation created
-- Centralized theme system created
-- Light and dark theme support implemented
-- Application routing implemented
-- Splash screen implemented
-- Login screen implemented
-- Home screen implemented
-- Application identity configured
+**Completed:**
+
+- Flutter project setup
+- Feature-first architecture
+- Riverpod integration
+- GoRouter routing
+- Material 3 theme system
+- Light/dark themes
+- Application shell
+- Splash screen
+- Login screen
+- Navigation foundation
+
+---
 
 ### Firebase Foundation
 
-- Firebase project created
-- Firebase Android application configured
-- FlutterFire CLI configured
-- Firebase initialized during application startup
-- Current Firebase services: Firebase Core, Firebase Authentication, Cloud Firestore
+**Completed:**
+
+- Firebase initialization
+- Firebase Authentication
+- Cloud Firestore integration
+
+---
 
 ### Authentication Foundation
 
-- Authentication repository architecture created
-- Google Sign-In implemented
-- Firebase Authentication implemented
-- AppUser domain model created
-- Firebase user mapping implemented
-- Authentication providers created
-- Login flow implemented
-- Logout flow implemented
-- Authentication state handling implemented
-- Startup authentication checking implemented
+**Completed:**
+
+- Authentication repository
+- Google Sign-In
+- Firebase Authentication
+- AppUser entity
+- Authentication providers
+- Login flow
+- Logout flow
+- Authentication state management
+
+**Flow:**
+```
+Firebase Authentication
+         ↓
+    Auth Repository
+         ↓
+      AppUser
+         ↓
+    Auth Providers
+```
+
+---
 
 ### Rider Identity Foundation
 
-- RiderProfile domain entity created
-- Profile repository abstraction created
-- Firebase profile repository implemented
-- Firestore profile datasource created
-- Profile providers created
-- Automatic profile creation after authentication implemented
-- Existing profile loading implemented
+**Completed:**
+
+- RiderProfile entity
+- Profile repository
+- Firestore profile storage
+- Profile providers
+- Automatic profile creation
+- Profile loading
+
+**Purpose:**
+
+| Authentication | Rider Profile |
+|----------------|---------------|
+| "Who is this user?" | "Who is this rider?" |
 
 ---
 
-## In Progress
+## Map Foundation
 
-### Map Foundation (Phase 2)
+**Status: COMPLETE**
 
-**Status:** Phases 1-10 Complete, Phase 11 Next
+The map architecture is **provider agnostic**.
 
-- MapProvider abstraction defined (provider-agnostic map rendering)
-- LocationRepository abstraction defined (separate location/GPS services)
-- FlutterMapProvider implementation completed (flutter_map + OpenStreetMap)
-- GeolocatorLocationRepository implementation completed (geolocator package)
-- Feature structure defined: `features/map/` and `features/location/`
-- Dependencies documented: flutter_map, latlong2, geolocator, geocoding
-- Platform configuration documented for Android/iOS/Web
-- AppMap widget created with Riverpod providers
-- Camera operations implemented (move, animate, zoom, fitBounds)
-- Marker operations implemented (add, remove, update, clear)
-- Polyline operations implemented (add, remove, clear)
-- Map event system implemented (MapEvent, EventBus)
-- Location providers implemented (locationPermissionProvider, currentPositionProvider, initialPositionProvider)
-- User location layer implemented (current location marker, live position updates)
-- Accuracy circle, heading indicator, direction arrow (pending)
-
-# Architecture Overview
-
-RideTogether follows a feature-first architecture with Riverpod for state management and GoRouter for navigation.
-
-### Architecture Layers
+### Current Implementation
 
 ```
-UI (Widgets)
-    ↓
-Riverpod Providers (State Management & DI)
-    ↓
-Repositories (Abstractions)
-    ↓
-Data Sources (Implementations)
-    ↓
-External Systems (Firebase, Maps, GPS, etc.)
+flutter_map
+OpenStreetMap
 ```
 
-### Feature Structure
+### Architecture
 
-Each feature follows this structure:
+```
+AppMap
+     ↓
+MapEngine
+     ↓
+FlutterMapEngine
+     ↓
+flutter_map
+```
+
+### Future Providers
+
+- Google Maps
+- Mapbox
+- HERE Maps
+
+> **Changing providers should only require a new `MapEngine` implementation.**
+
+---
+
+## Map Responsibilities
+
+### The Map Feature Owns
+
+- Map rendering
+- Camera control
+- Markers
+- Polylines
+- Layers
+- Map interactions
+- Map overlays
+
+### The Map Does NOT Own
+
+- GPS
+- Permissions
+- Ride logic
+- Rider synchronization
+- Navigation logic
+
+---
+
+## Location Architecture
+
+Location is **separate from maps**.
+
+### Flow
+
+```
+GPS
+    ↓
+LocationRepository
+    ↓
+PositionEntity
+    ↓
+Riverpod Providers
+    ↓
+Map Rendering
+```
+
+### Current Implementation
+
+```
+Phone GPS
+    ↓
+GeolocatorLocationRepository
+    ↓
+PositionEntity
+    ↓
+currentPositionProvider
+    ↓
+UserLocationMarker
+    ↓
+AppMap
+```
+
+**Key Principle:** The map receives location data. The map never requests GPS directly.
+
+---
+
+## Completed Map Features
+
+**Implemented:**
+
+- MapEngine abstraction
+- FlutterMapEngine
+- OpenStreetMap rendering
+- AppMap widget
+- GeoPoint
+- CameraPosition
+- MapMarker
+- MapPolyline
+- MapBounds
+- Position integration
+- Current position stream
+- User location marker
+- Accuracy circle
+- Heading animation
+- Marker foundation
+- Polyline foundation
+
+---
+
+## Architecture Overview
+
+RideTogether follows:
+
+- Feature-first architecture
+- Repository pattern
+- Riverpod state management
+- Domain separation
+
+### General Flow
+
+```
+Presentation
+     ↓
+Providers
+     ↓
+Domain
+     ↓
+Repositories
+     ↓
+External Systems
+```
+
+---
+
+## Feature Structure
 
 ```
 features/
-  feature_name/
-    data/
-      - models/
-      - repositories/
-      - datasources/
-    domain/
-      - entities/
-      - repositories/
-      - mappers/
-    presentation/
-      - screens/
-      - widgets/
-      - providers/
+├── auth/
+├── profile/
+├── startup/
+├── map/
+├── location/
+└── ride/
 ```
 
-### Current Features
+### Feature Structure Template
 
-- **auth/** — Google Sign-In, Firebase Auth, user state management
-- **home/** — Home screen presentation
-- **profile/** — RiderProfile entity, repository, Firestore datasource, providers
-- **startup/** — Splash screen, authentication check, profile loading
-- **map/** — MapProvider abstraction, FlutterMapProvider, camera/marker/polyline operations, AppMap widget
-- **location/** — (Planned) LocationRepository abstraction, GeolocatorLocationRepository
+```
+feature/
+├── data/
+├── domain/
+└── presentation/
+```
 
 ---
 
-# Important File Locations
+## Important File Locations
 
 | Purpose | Location |
 |---------|----------|
 | Application entry | `lib/main.dart` |
-| App configuration | `lib/app/app.dart` |
-| Routing | `lib/app/router/app_router.dart` |
+| App configuration | `lib/app/` |
+| Routing | `lib/app/router/` |
 | Theme system | `lib/core/theme/` |
-| Authentication feature | `lib/features/auth/` |
-| Profile feature | `lib/features/profile/` |
-| Startup feature | `lib/features/startup/` |
-| Map feature | `lib/features/map/` |
-| Location feature (planned) | `lib/features/location/` |
+| Authentication | `lib/features/auth/` |
+| Rider profile | `lib/features/profile/` |
+| Startup | `lib/features/startup/` |
+| Map | `lib/features/map/` |
+| Location | `lib/features/location/` |
 | Firebase config | `lib/firebase_options.dart` |
-| Project config | `pubspec.yaml`, `firebase.json` |
 
 ---
 
-# Development Rules
+## Development Rules
 
-### Architecture Rules
+### Widgets
 
-- Feature-first organization
-- Repository pattern for data access
-- Riverpod for state management and DI
-- GoRouter for navigation
-- Separation of concerns: UI → Providers → Repositories → Data Sources → External Systems
+**Widgets should:**
+- Render UI
+- Receive state
+- Trigger actions
 
-### Coding Rules
-
-- Widgets only handle UI rendering
-- Business logic in providers, repositories, services
-- No Firebase calls in widgets
-- Use repository abstractions, not direct external service calls
-- All UI styling through `lib/core/theme/`
-
-### Design System
-
-All styling through `lib/core/theme/`:
-- Colors, typography, spacing, radius, shadows, durations
-- Use `Theme.of(context)` for adaptive styling
-- No hardcoded colors, spacing, or animation values
+**Widgets should NOT:**
+- Access Firebase
+- Access GPS
+- Contain business logic
 
 ---
 
-# Current Development Priorities
+### Providers
 
-1. **Complete map foundation** — Implement MapProvider and LocationRepository abstractions with OpenStreetMap/flutter_map
-2. **Integrate location permissions** — Request and manage GPS permissions
-3. **Create map experience** — Build map screen with camera, markers, and polylines
-4. **Create Ride feature** — Group ride creation, joining, and management
-5. **Add live location tracking** — Real-time rider positions during rides
-6. **Add group synchronization** — Leader/follower coordination, checkpoints, regroup commands
+**Providers manage:**
+- Application state
+- Feature state
+- Dependency injection
 
 ---
 
-# Future Direction
+### Repositories
 
-### Mapping Architecture
+**Repositories:**
+- Hide external systems
+- Expose application contracts
 
-RideTogether uses a **provider-agnostic mapping architecture**. The current implementation uses **OpenStreetMap via flutter_map**, but the application is designed so the underlying map provider can be replaced (Google Maps, Mapbox, HERE, etc.) without affecting business logic.
+**Never:**
+```
+Widget
+   ↓
+Firebase/GPS/API
+```
 
-**Maps and Location are separate features:**
-- **Map feature** — Rendering, camera, markers, polylines, tile providers
-- **Location feature** — GPS, permissions, current position, continuous updates, geocoding
-
-**Abstractions:**
-- `MapProvider` interface with implementations: `FlutterMapProvider` (current), `GoogleMapsProvider` (future), `MapboxProvider` (future), `HEREMapsProvider` (future)
-- `LocationRepository` interface with implementations: `GeolocatorLocationRepository` (current), alternatives for testing/future providers
+**Preferred:**
+```
+Widget
+   ↓
+Provider
+   ↓
+Repository
+   ↓
+External System
+```
 
 ---
 
-### Journey Architecture
+## Current Development Priorities
 
-RideTogether currently focuses only on **Ride mode**. **Reach** is a future feature.
+### Next Milestone: Map Experience
 
-Future architecture:
+**Build:**
+```
+MapScreen
+```
+
+**The application moves toward:**
+```
+Authentication
+     ↓
+Map Experience
+     ↓
+Ride Features
+```
+
+---
+
+## Roadmap Summary
+
+| Phase | Status | Focus |
+|-------|--------|-------|
+| 1. Application Foundation | ✅ Complete | Flutter, Riverpod, GoRouter, Theme, Auth, Profile |
+| 2. Map Foundation | ✅ Complete | Provider-agnostic map, OSM, Location integration |
+| 3. Map Experience | 🔄 Next | MapScreen, Floating controls, Map modes |
+| 4. Ride System | 📋 Planned | Create/join rides, Ride lifecycle, Roles |
+| 5. Live Ride Experience | 📋 Planned | Rider sync, Live locations, Group map |
+| 6. Navigation Foundation | 📋 Future | Route display, ETA, Waypoints |
+| 7. Ride Coordination | 📋 Future | Checkpoints, Regroup, Communication |
+| 8. Smart Ride Features | 📋 Future | Off-route detection, Safety alerts |
+| 9. Ride History | 📋 Future | Replay, Statistics, Summaries |
+
+---
+
+## Future Journey Architecture
+
+### Current MVP
+
+```
+Ride
+```
+
+### Future
 
 ```
 Journey
@@ -323,51 +480,80 @@ Journey
 └── Reach
 ```
 
-A Journey represents a shared group movement activity. Shared Journey functionality includes: members, destination, location tracking, map visualization, status, notifications, chat, events, history.
+**Journey owns shared concepts:**
+- Members
+- Status
+- Notifications
+- History
+- Location sharing
 
-Do not restructure the current project for Reach before MVP completion.
-
----
-
-### Ride Mode (Current MVP)
-
-- Purpose: Travel together
-- Experience: Follow the leader
-- Control: Leader controlled
-- Capabilities: Leader, route control, checkpoints, regroup commands, group synchronization
+**Rule:** Do not duplicate these systems.
 
 ---
 
-### Reach Mode (Future)
+## Ride Mode
 
-- Purpose: Meet at a destination
-- Experience: Everyone travels independently
-- Control: No leader
-- Capabilities: Shared destination, individual navigation, arrival tracking, participant progress
+**Current MVP.**
+
+### Purpose
+
+Travel together.
+
+### Experience
+
+Follow the leader.
+
+### Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| Leader | Designated ride leader |
+| Route Control | Leader controls the route |
+| Checkpoints | Planned stops |
+| Regroup Commands | Leader can call regroup |
+| Group Synchronization | Keep riders together |
 
 ---
 
-### Future Technical Direction
+## Reach Mode
 
-- **Live Tracking** — GPS updates, rider location synchronization, Realtime Database
-- **Communication** — Ride chat, notifications, emergency communication
-- **Safety** — Crash detection, hazard reporting, emergency contacts
+**Future.**
+
+### Purpose
+
+Meet at a destination.
+
+### Experience
+
+Everyone travels independently.
+
+### Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| Shared Destination | Common meeting point |
+| Arrival Tracking | Monitor who has arrived |
+| Participant Progress | See everyone's progress |
 
 ---
 
-# Architecture Evolution Rules
+## Architecture Evolution Rules
 
-After major milestones update:
-- Version number
-- Current status
-- Completed architecture
-- Important file locations
-- Development priorities
+### After Major Milestones Update
 
-Do not:
-- Add speculative architecture
-- Create future modules before implementation
-- Duplicate shared systems
-- Move files without architectural reason
+- Version
+- Completed features
+- Architecture changes
+- Important files
+- Priorities
 
-The architecture document should always describe the implemented system, not only future plans.
+### Do Not
+
+- Document features that do not exist
+- Create speculative modules
+- Couple features together unnecessarily
+- Put business logic into infrastructure layers
+
+---
+
+The context document should always describe the **current system** and the **next intention**.

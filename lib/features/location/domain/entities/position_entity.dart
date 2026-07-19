@@ -5,6 +5,7 @@ class PositionEntity {
   final double? altitude;
   final double? heading;
   final double? speed;
+  final DateTime timestamp;
 
   const PositionEntity({
     required this.latitude,
@@ -13,5 +14,6 @@ class PositionEntity {
     this.altitude,
     this.heading,
     this.speed,
+    required this.timestamp,
   });
 }

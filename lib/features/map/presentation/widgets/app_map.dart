@@ -7,6 +7,7 @@ import '../../domain/entities/geo_point.dart';
 import '../../domain/entities/map_marker.dart';
 import '../../domain/entities/map_polyline.dart';
 import '../providers/map_engine_provider.dart';
+import '../providers/user_marker_provider.dart';
 
 
 class AppMap extends ConsumerWidget {
@@ -31,6 +32,9 @@ Widget build(BuildContext context, WidgetRef ref) {
 
   final mapEngine =
       ref.watch(mapEngineProvider);
+
+  final userLocationMarker =
+      ref.watch(userLocationMarkerProvider);
 
 
   final brightness =
@@ -59,6 +63,7 @@ Widget build(BuildContext context, WidgetRef ref) {
     polylines: polylines,
 
     theme: mapTheme,
+    userLocationMarker: userLocationMarker,
   );
 }
 }
