@@ -1,7 +1,7 @@
 # RideTogether Local Development Setup
 
-**Version:** 3.0  
-**Last Updated:** 2026-07-17
+**Version:** 3.1  
+**Last Updated:** 2026-07-23
 
 ---
 
@@ -247,8 +247,8 @@ dependencies:
   geolocator: ^14.0.2
   permission_handler: ^12.0.1
   geocoding: ^4.0.0
-  flutter_google_places_sdk: ^0.4.2
   flutter_polyline_points: ^3.0.1
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

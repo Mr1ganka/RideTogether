@@ -1,7 +1,7 @@
 # RideTogether Project Context
 
-**Version:** 3.0  
-**Last Updated:** 2026-07-17
+**Version:** 4.1  
+**Last Updated:** 2026-07-23
 
 ---
 
@@ -116,7 +116,7 @@ RideTogether should remain:
 
 ### Current Version
 
-**v0.0.4 — Map Foundation Complete**
+**v0.3 — Map Experience Complete**
 
 ---
 
@@ -136,6 +136,8 @@ RideTogether should remain:
 - Splash screen
 - Login screen
 - Navigation foundation
+- Startup location permission gate (`StartupResult`, `LocationRequiredScreen`)
+- `AppLifecycleObserver` re-checks permissions on resume
 
 ---
 
@@ -196,7 +198,7 @@ Firebase Authentication
 
 ## Map Foundation
 
-**Status: COMPLETE**
+**Status: COMPLETE ✅**
 
 The map architecture is **provider agnostic**.
 
@@ -210,7 +212,7 @@ OpenStreetMap
 ### Architecture
 
 ```
-AppMap
+AppMap (accepts MapController)
      ↓
 MapEngine
      ↓
@@ -218,6 +220,22 @@ FlutterMapEngine
      ↓
 flutter_map
 ```
+
+### Map Controls
+
+Floating map controls overlay the map with a full-width bottom nav bar:
+- `BottomNavBar` with icon tiles (Profile, Rides, Settings, Logout) + centered `JoinRidePill`
+- `NavHandle` for show/hide toggle
+- `RecenterButton` with `my_location` icon
+- Auto-hide behavior in `activeRide` mode (3s timer)
+- Hidden in `navigation` mode
+
+### Map Modes
+
+`MapMode` enum (via `mapModeProvider`) controls control visibility:
+- `idle` — Always visible
+- `activeRide` — Auto-hide after 3s
+- `navigation` — Hidden
 
 ### Future Providers
 
@@ -294,7 +312,7 @@ AppMap
 **Implemented:**
 
 - MapEngine abstraction
-- FlutterMapEngine
+- FlutterMapEngine (accepts external `MapController`)
 - OpenStreetMap rendering
 - AppMap widget
 - GeoPoint
@@ -302,13 +320,21 @@ AppMap
 - MapMarker
 - MapPolyline
 - MapBounds
+- `MapMode` enum (`idle`, `searchingRide`, `activeRide`, `navigation`, `completedRide`)
+- `mapModeProvider` — `StateProvider<MapMode>`
+- `mapControllerProvider` — `Provider<MapController>`
 - Position integration
 - Current position stream
 - User location marker
 - Accuracy circle
 - Heading animation
+- Direction cone painter (refactored with design tokens)
 - Marker foundation
 - Polyline foundation
+- Floating Map Controls (auto-hide navbar, Recenter, JoinRide pill)
+- `StartupResult` sealed class with `StartupReady` / `StartupLocationRequired`
+- `LocationRequiredScreen` — permission gate screen
+- `AppLifecycleObserver` — re-checks permissions on app resume
 
 ---
 
@@ -371,7 +397,9 @@ feature/
 | Authentication | `lib/features/auth/` |
 | Rider profile | `lib/features/profile/` |
 | Startup | `lib/features/startup/` |
+| Home screen | `lib/features/home/presentation/screens/home_screen.dart` |
 | Map | `lib/features/map/` |
+| Map floating controls | `lib/features/map/presentation/widgets/navbar/` |
 | Location | `lib/features/location/` |
 | Firebase config | `lib/firebase_options.dart` |
 
@@ -430,20 +458,22 @@ External System
 
 ## Current Development Priorities
 
-### Next Milestone: Map Experience
+### Next Milestone: Ride Foundation
 
 **Build:**
 ```
-MapScreen
+Join Ride Flow
+Create Ride Flow
+Ride Lifecycle
 ```
 
 **The application moves toward:**
 ```
 Authentication
      ↓
-Map Experience
+Map Experience ✅
      ↓
-Ride Features
+Ride Features 🔄 NEXT
 ```
 
 ---
@@ -454,8 +484,8 @@ Ride Features
 |-------|--------|-------|
 | 1. Application Foundation | ✅ Complete | Flutter, Riverpod, GoRouter, Theme, Auth, Profile |
 | 2. Map Foundation | ✅ Complete | Provider-agnostic map, OSM, Location integration |
-| 3. Map Experience | 🔄 Next | MapScreen, Floating controls, Map modes |
-| 4. Ride System | 📋 Planned | Create/join rides, Ride lifecycle, Roles |
+| 3. Map Experience | ✅ Complete | Map-first HomeScreen, Floating controls (navbar w/ auto-hide), MapMode, Recenter |
+| 4. Ride System | 🔄 Next | Create/join rides, Ride lifecycle, Roles |
 | 5. Live Ride Experience | 📋 Planned | Rider sync, Live locations, Group map |
 | 6. Navigation Foundation | 📋 Future | Route display, ETA, Waypoints |
 | 7. Ride Coordination | 📋 Future | Checkpoints, Regroup, Communication |

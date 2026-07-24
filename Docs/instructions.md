@@ -1,7 +1,7 @@
 ﻿# RideTogether AI Development Instructions
 
-**Version:** 3.0  
-**Last Updated:** 2026-07-17
+**Version:** 4.1  
+**Last Updated:** 2026-07-23
 
 ---
 
@@ -323,6 +323,23 @@ AppMap
 
 **Key Principle:** The map receives location data. The map never requests GPS.
 
+### Startup Location Flow
+
+Location permission is checked during startup:
+
+```
+SplashScreen (startupProvider)
+    │
+    ├── StartupLocationRequired → LocationRequiredScreen
+    │       ├── Grant → invalidate startupProvider → re-check
+    │       ├── Permanently Denied → Open Settings
+    │       └── Denied → Request permission dialog
+    │
+    └── StartupReady → HomeScreen (map)
+```
+
+**Lifecycle:** `AppLifecycleObserver` watches app lifecycle and invalidates `startupProvider` on resume, ensuring permissions are re-checked when the user returns from Settings.
+
 ---
 
 ## Current Map Features Completed
@@ -332,17 +349,25 @@ AppMap
 - MapEngine abstraction
 - FlutterMapEngine
 - OpenStreetMap rendering
-- AppMap widget
+- AppMap widget (now accepts `MapController` for external camera control)
+- `mapControllerProvider` — shared MapController for navbar recentering
 - Camera domain models
 - GeoPoint
 - Map markers
 - Map polylines
+- `MapMode` enum (`idle`, `searchingRide`, `activeRide`, `navigation`, `completedRide`)
+- `mapModeProvider` — Riverpod state for current map mode
 - Map bounds
 - Current location stream
 - User location marker
 - Accuracy circle
 - Heading indicator
 - Location animations
+- Floating Map Controls (navbar with NavHandle auto-hide, Recenter button, JoinRide pill)
+- Direction Cone Painter refactored to use design tokens
+- Location permission flow integrated into startup (`StartupResult`, `LocationRequiredScreen`)
+- `AppLifecycleObserver` re-checks permissions on app resume
+- `startupProvider` now returns `Future<StartupResult>` (typed instead of `void`)
 
 ---
 
@@ -351,17 +376,17 @@ AppMap
 ### Current Milestone
 
 ```
-Map Foundation
-DONE
+Map Experience
+DONE (Floating Controls + Map Modes)
 ```
 
 ### Next Milestone
 
 ```
-Map Experience
+Join Ride Flow
 ```
 
-The map becomes the main application screen.
+The map is now the main application experience with floating controls.
 
 ---
 
@@ -369,50 +394,88 @@ The map becomes the main application screen.
 
 ### Phase 1 — Map Screen
 
-**Create:** `features/map/presentation/screens/map_screen.dart`
+**Status:** ✅ The map is the primary screen via `HomeScreen`. No separate `MapScreen` was created — floating controls were integrated directly into `HomeScreen` as a more practical approach.
 
-**Purpose:** The main application workspace.
-
-**Structure:**
+**Current structure:**
 
 ```
-MapScreen
+HomeScreen
 Stack
-├── AppMap
-├── Floating Controls
-├── Ride Panels
-├── Bottom Sheets
-└── Dialogs
+├── AppMap (with mapController)
+└── FloatingMapControls
+    ├── RecenterButton
+    ├── BottomNavBar (Profile, Rides, JoinRide, Settings, Logout)
+    └── NavHandle (slide toggle)
 ```
-
-**The map remains independent.**
 
 ---
 
-### Phase 2 — Floating Map Controls
+### Phase 2 — Floating Map Controls ✅
 
-**Add contextual controls:**
+**Status:** ✅ Complete
+
+**Created:**
+- `features/map/presentation/widgets/floating_map_controls.dart` (export hub)
+- `features/map/presentation/widgets/navbar/bottom_nav_bar.dart`
+- `features/map/presentation/widgets/navbar/floating_map_controls.dart` (main widget with AutoHide logic)
+- `features/map/presentation/widgets/navbar/recenter_button.dart`
+- `features/map/presentation/widgets/navbar/nav_icon_button.dart`
+- `features/map/presentation/widgets/navbar/join_ride_pill.dart`
+- `features/map/presentation/widgets/navbar/nav_handle.dart`
+
+**Design:**
+
+Bottom bar across full width (not a FAB stack):
+- Translucent surface panel (`surface` at 0.94 opacity, `AppRadius.xl`)
+- Row of `NavIconButton` tiles + center `JoinRidePill`
+- `NavHandle` sits on top of the bar for toggle
+- `RecenterButton` positioned above-right of the bar
 
 **Idle Controls:**
-- Join Ride
-- Profile
-- My Rides
-- Settings
-- Recenter
+| Control | Icon | Action |
+|---------|------|--------|
+| Join Ride | `group_add_outlined` (pill) | Navigate to join flow |
+| Profile | `person_outlined` | Open rider profile |
+| Rides | `history_outlined` | View ride history |
+| Settings | `settings_outlined` | App settings |
+| Logout | `logout` | Sign out |
 
-**Future Ride Controls:**
-- Ride information
-- Rider list
-- Route options
-- Group status
+**Standalone Recenter Button:**
+- `my_location` icon in circular container
+- Always visible (except in `navigation` mode)
+- Centers map on user's current GPS position via `mapController`
 
-**Controls should appear over the map.**
+**Visibility Behavior (via `FloatingMapControls` widget):**
+
+| Mode | Behavior |
+|------|----------|
+| `idle` | Controls always visible, no auto-hide |
+| `activeRide` | Controls auto-slide down after 3s of inactivity. Tap to bring back up for another 3s. |
+| `navigation` | Controls hidden (returns `SizedBox.shrink`) |
+
+**Transitions:**
+- Slide down/up animation using `AppDurations.normal` (300ms) + `CurvedAnimation(curve: Curves.easeInOut)`
+- When switching `idle → activeRide`, controls hide
+- When switching `activeRide → idle`, controls show
+- `SlideTransition` with `Tween<Offset>(begin: Offset.zero, end: Offset(0, 1.15))`
+
+**State:**
+- Uses `SingleTickerProviderStateMixin` for slide animation
+- Uses `Timer` with `AppDurations.autoHideNav` (3s) for auto-hide
+- Reads `mapModeProvider` to decide visibility
+- Reads `currentPositionProvider` and `authRepositoryProvider` for actions
+
+**Controls appear over the map in a Stack within `HomeScreen`.**
 
 ---
 
-### Phase 3 — Map Modes
+### Phase 3 — Map Modes ✅
 
-**Introduce:**
+**Status:** ✅ Complete
+
+**Created:**
+- `features/map/domain/entities/map_mode.dart` — `MapMode` enum
+- `features/map/presentation/providers/map_mode_provider.dart` — `StateProvider<MapMode>`
 
 ```dart
 enum MapMode {
@@ -424,7 +487,12 @@ enum MapMode {
 }
 ```
 
-Each mode controls visible overlays.
+Each mode controls visible overlays and FloatingMapControls behavior:
+- `idle` — Full controls visible, Recenter active, no auto-hide
+- `searchingRide` — Join Ride replaced with Cancel Search
+- `activeRide` — Controls auto-hide after 3s, Ride controls visible
+- `navigation` — All controls hidden (minimal distraction)
+- `completedRide` — Ride summary panel, controls return to idle
 
 ---
 
@@ -604,9 +672,9 @@ Everyone travels independently.
 
 **Implement in this order:**
 
-1. **MapScreen** — Main map experience
-2. **Floating map controls** — Contextual UI overlays
-3. **Map state system** — MapMode enum and state management
+1. ~~**MapScreen**~~ — Main map experience (currently via `HomeScreen` + floating controls)
+2. ~~**Floating map controls**~~ — ✅ Done (navbar, recenter, auto-hide)
+3. ~~**Map state system**~~ — ✅ Done (`MapMode`, `mapModeProvider`, `mapControllerProvider`)
 4. **Join Ride flow** — Entry point for rides
 5. **Ride feature** — Create/join rides, lifecycle
 6. **Rider synchronization** — Live location sharing
@@ -640,4 +708,4 @@ Future Journey Platform
 
 ---
 
-*Document Version 3.0 — Updated after Map Foundation completion.*
+*Document Version 4.0 — Updated after Floating Map Controls & Map Modes completion.*

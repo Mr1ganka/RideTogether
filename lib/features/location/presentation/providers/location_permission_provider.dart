@@ -3,14 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/permission_status_entity.dart';
 import 'location_repository_provider.dart';
 
-final locationPermissionProvider = AsyncNotifierProvider<
-    LocationPermissionNotifier,
-    PermissionStatusEntity>(
-  LocationPermissionNotifier.new,
-);
+final locationPermissionProvider =
+    AsyncNotifierProvider<LocationPermissionNotifier, PermissionStatusEntity>(
+      LocationPermissionNotifier.new,
+    );
 
-class LocationPermissionNotifier
-    extends AsyncNotifier<PermissionStatusEntity> {
+class LocationPermissionNotifier extends AsyncNotifier<PermissionStatusEntity> {
+  bool hasRequestedPermission = false;
 
   @override
   Future<PermissionStatusEntity> build() async {
@@ -22,23 +21,48 @@ class LocationPermissionNotifier
   Future<PermissionStatusEntity> requestPermission() async {
     state = const AsyncLoading();
 
-    final repository =
-        ref.read(locationRepositoryProvider);
+    hasRequestedPermission = true;
+
+    final repository = ref.read(locationRepositoryProvider);
 
     final result = await repository.requestPermission();
 
-    state = AsyncValue.data(result);
+    state = AsyncData(result);
 
     return result;
   }
 
-  Future<void> refreshPermission() async {
-    state = const AsyncLoading();
-
+  Future<PermissionStatusEntity> refreshPermission() async {
     final repository = ref.read(locationRepositoryProvider);
 
-    state = await AsyncValue.guard(
-      repository.checkPermission,
-    );
+    final result = await repository.checkPermission();
+
+    state = AsyncData(result);
+
+    return result;
   }
+
+  Future<PermissionStatusEntity> ensurePermissionGranted() async {
+    final repository = ref.read(locationRepositoryProvider);
+
+    var status = await repository.checkPermission();
+
+    if (status == PermissionStatusEntity.denied) {
+      status = await repository.requestPermission();
+    }
+
+    state = AsyncData(status);
+
+    return status;
+  }
+
+  bool get isPermanentlyDenied {
+    return state.value == PermissionStatusEntity.permanentlyDenied;
+  }
+
+  bool get shouldOpenSettings {
+  return hasRequestedPermission &&
+      state.value == PermissionStatusEntity.denied;
+}
+
 }

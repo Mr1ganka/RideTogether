@@ -1,6 +1,6 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:ride_together/core/theme/app_colors.dart';
 
 class DirectionConePainterWidget extends StatelessWidget {
   const DirectionConePainterWidget({super.key});
@@ -8,70 +8,62 @@ class DirectionConePainterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(80, 80),
+      size: const Size(AppColors.directionConeSize, AppColors.directionConeSize),
       painter: DirectionConePainter(),
     );
   }
 }
 
 class DirectionConePainter extends CustomPainter {
+  static const _alphaStrong = AppColors.directionConeAlphaStrong;
+  static const _alphaMid = AppColors.directionConeAlphaMid;
+  static const _alphaFade = AppColors.directionConeAlphaFade;
+  static const _blur = AppColors.directionConeBlur;
+  static const _color = AppColors.directionConeBeam;
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
 
     final beamPath = Path();
 
-    /*
-      The beam starts underneath the dot.
-
-      It is intentionally NOT a triangle.
-      The shape is only a mask for the gradient.
-
-      The blur does the visual work.
-    */
-
-    beamPath.moveTo(center.dx - 8, center.dy);
+    beamPath.moveTo(center.dx - size.width * 0.1, center.dy);
 
     beamPath.quadraticBezierTo(
-      center.dx - 20,
-      center.dy - 22,
-      center.dx - 18,
-      center.dy - 48,
+      center.dx - size.width * 0.25,
+      center.dy - size.height * 0.275,
+      center.dx - size.width * 0.225,
+      center.dy - size.height * 0.6,
     );
 
     beamPath.quadraticBezierTo(
       center.dx,
-      center.dy - 60,
-      center.dx + 18,
-      center.dy - 48,
+      center.dy - size.height * 0.75,
+      center.dx + size.width * 0.225,
+      center.dy - size.height * 0.6,
     );
 
     beamPath.quadraticBezierTo(
-      center.dx + 20,
-      center.dy - 22,
-      center.dx + 8,
+      center.dx + size.width * 0.25,
+      center.dy - size.height * 0.275,
+      center.dx + size.width * 0.1,
       center.dy,
     );
 
     beamPath.close();
 
     final paint = Paint()
-      ..shader = const LinearGradient(
+      ..shader = LinearGradient(
         begin: Alignment.bottomCenter,
-
         end: Alignment.topCenter,
-
         colors: [
-          Color.fromRGBO(66, 133, 244, 0.45),
-
-          Color.fromRGBO(66, 133, 244, 0.18),
-
-          Color.fromRGBO(66, 133, 244, 0.0),
+          _color.withValues(alpha: _alphaStrong),
+          _color.withValues(alpha: _alphaMid),
+          _color.withValues(alpha: _alphaFade),
         ],
-
-        stops: [0.0, 0.45, 1.0],
+        stops: const [0.0, 0.45, 1.0],
       ).createShader(Offset.zero & size)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, _blur)
       ..isAntiAlias = true;
 
     canvas.drawPath(beamPath, paint);

@@ -196,6 +196,24 @@ abstract final class AppTheme {
           ),
         ),
       ),
+
+      // AppBar / Navigation Bar
+      appBarTheme: AppBarTheme(
+        backgroundColor: surface,
+        foregroundColor: textPrimary,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(
+          color: textPrimary,
+        ),
+        iconTheme: IconThemeData(
+          color: textPrimary,
+        ),
+        actionsIconTheme: IconThemeData(
+          color: textPrimary,
+        ),
+      ),
     );
   }
 }

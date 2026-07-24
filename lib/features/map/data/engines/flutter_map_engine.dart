@@ -22,6 +22,7 @@ class FlutterMapEngine implements MapEngine {
     required List<MapPolyline> polylines,
     required MapTheme theme,
     map_entity.UserLocationMarker? userLocationMarker,
+    MapController? mapController,
   }) {
     final allMarkers = <MapMarker>[...markers];
 
@@ -36,6 +37,7 @@ class FlutterMapEngine implements MapEngine {
     }
 
     return FlutterMap(
+      mapController: mapController,
       options: MapOptions(
         initialCenter: initialCamera.target.toFlutterMapLatLng(),
 

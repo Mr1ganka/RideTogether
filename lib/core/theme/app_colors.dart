@@ -102,6 +102,24 @@ abstract final class AppColors {
   /// Hazard marker.
   static const Color hazardMarker = danger;
 
+  /// Direction cone beam color.
+  static const Color directionConeBeam = Color(0xFF4285F4);
+
+  /// Direction cone beam alpha (strong).
+  static const double directionConeAlphaStrong = 0.45;
+
+  /// Direction cone beam alpha (mid).
+  static const double directionConeAlphaMid = 0.18;
+
+  /// Direction cone beam alpha (fade).
+  static const double directionConeAlphaFade = 0.0;
+
+  /// Direction cone beam blur radius.
+  static const double directionConeBlur = 12.0;
+
+  /// Direction cone widget size.
+  static const double directionConeSize = 80.0;
+
   // ---------------------------------------------------------------------------
   // Miscellaneous
   // ---------------------------------------------------------------------------

@@ -66,4 +66,7 @@ abstract final class AppDurations {
 
   /// Route update animation duration.
   static const Duration routeUpdate = Duration(milliseconds: 500);
+
+  /// Bottom nav auto-hide delay.
+  static const Duration autoHideNav = Duration(seconds: 3);
 }

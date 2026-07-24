@@ -1,7 +1,7 @@
 # RideTogether Map Foundation
 
-**Version:** 4.0  
-**Last Updated:** 2026-07-17
+**Version:** 5.1  
+**Last Updated:** 2026-07-23
 
 ---
 
@@ -122,32 +122,16 @@ MapEngine (Interface)
 
 ```dart
 // Domain: features/map/domain/engine/map_engine.dart
-abstract class MapEngine {
-  // Rendering
-  Widget build(BuildContext context);
-  
-  // Camera
-  void moveCamera(CameraPosition position);
-  void animateCamera(CameraPosition position, Duration duration);
-  CameraPosition getCurrentCameraPosition();
-  Future<void> fitBounds(MapBounds bounds, {EdgeInsets? padding});
-  
-  // Markers
-  void addMarker(MapMarker marker);
-  void removeMarker(String markerId);
-  void clearMarkers();
-  
-  // Polylines
-  void addPolyline(MapPolyline polyline);
-  void removePolyline(String polylineId);
-  void clearPolylines();
-  
-  // Bounds
-  MapBounds getVisibleBounds();
-  LatLngBounds getVisibleLatLngBounds();
-  
-  // Events
-  Stream<MapEvent> get mapEvents;
+abstract interface class MapEngine {
+  Widget build({
+    required BuildContext context,
+    required CameraPosition initialCamera,
+    required List<MapMarker> markers,
+    required List<MapPolyline> polylines,
+    MapController? mapController,
+    UserLocationMarker? userLocationMarker,
+    required MapTheme theme,
+  });
 }
 ```
 
@@ -172,13 +156,24 @@ features/
 │   │   │   ├── map_marker.dart
 │   │   │   ├── map_polyline.dart
 │   │   │   ├── map_bounds.dart
+│   │   │   ├── map_mode.dart
 │   │   │   └── user_location_marker.dart
 │   │   └── repositories/
 │   │       └── map_provider.dart
 │   └── presentation/
 │       ├── providers/
+│       │   ├── map_controller_provider.dart
+│       │   └── map_mode_provider.dart
 │       └── widgets/
-│           └── app_map.dart
+│           ├── app_map.dart
+│           ├── floating_map_controls.dart      (export hub)
+│           └── navbar/
+│               ├── floating_map_controls.dart  (main widget)
+│               ├── bottom_nav_bar.dart
+│               ├── recenter_button.dart
+│               ├── nav_icon_button.dart
+│               ├── join_ride_pill.dart
+│               └── nav_handle.dart
 │
 └── location/
     ├── data/
@@ -291,12 +286,14 @@ UserLocationMarker
 | Category | Features |
 |----------|----------|
 | **Architecture** | Provider-agnostic MapEngine abstraction, FlutterMapEngine implementation |
-| **Rendering** | OpenStreetMap tile rendering, AppMap widget |
-| **Domain Models** | GeoPoint, CameraPosition, MapMarker, MapPolyline, MapBounds |
+| **Rendering** | OpenStreetMap tile rendering, AppMap widget (accepts `MapController`) |
+| **Domain Models** | GeoPoint, CameraPosition, MapMarker, MapPolyline, MapBounds, MapMode |
 | **Location** | PositionEntity integration, Current position stream |
 | **User Marker** | Live user location updates, Custom user location marker |
 | **Animations** | Heading animation (shortest-path), Accuracy pulse animation |
 | **Foundations** | Marker system, Polyline system |
+| **Controls** | FloatingMapControls (auto-hide navbar), RecenterButton, MapController provider |
+| **Startup Gate** | `StartupResult` + `LocationRequiredScreen` gates map access behind location permission |
 
 ---
 
@@ -308,7 +305,7 @@ These improvements remain **within the map foundation** and can be implemented i
 
 | Enhancement | Description |
 |-------------|-------------|
-| Camera controller abstraction | Unified camera control interface |
+| Camera controller abstraction | Unified camera control interface — ✅ `mapControllerProvider` |
 | Animated camera movement | Smooth transitions with easing |
 | Fit bounds | Auto-fit markers/polylines |
 | Camera state management | Persist/restore camera position |
@@ -475,29 +472,34 @@ class UserLocationMarker {
 ```dart
 // features/map/presentation/widgets/app_map.dart
 class AppMap extends ConsumerWidget {
-  final CameraPosition? initialCameraPosition;
+  final CameraPosition? initialCamera;
   final List<MapMarker> markers;
   final List<MapPolyline> polylines;
-  final void Function(CameraPosition)? onCameraMove;
-  final void Function(GeoPoint)? onTap;
-  final void Function(GeoPoint)? onLongPress;
-  final MapMode mode;
+  final MapController mapController;
   
   const AppMap({
     super.key,
-    this.initialCameraPosition,
+    this.initialCamera,
     this.markers = const [],
     this.polylines = const [],
-    this.onCameraMove,
-    this.onTap,
-    this.onLongPress,
-    this.mode = MapMode.idle,
+    required this.mapController,
   });
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mapEngine = ref.watch(mapEngineProvider);
-    return mapEngine.build(context);
+    final mapTheme = ref.watch(mapThemeProvider);
+    final userLocationMarker = ref.watch(userLocationMarkerProvider);
+    
+    return mapEngine.build(
+      context,
+      initialCamera: initialCamera ?? CameraPosition.default_,
+      markers: markers,
+      polylines: polylines,
+      theme: mapTheme,
+      userLocationMarker: userLocationMarker,
+      mapController: mapController,
+    );
   }
 }
 ```
@@ -507,65 +509,35 @@ class AppMap extends ConsumerWidget {
 ```dart
 // features/map/data/engines/flutter_map_engine.dart
 class FlutterMapEngine implements MapEngine {
-  final MapController _mapController = MapController();
-  final List<MapMarker> _markers = [];
-  final List<MapPolyline> _polylines = [];
-  CameraPosition? _currentCameraPosition;
-  
   @override
-  Widget build(BuildContext context) {
+  Widget build({
+    required BuildContext context,
+    required CameraPosition initialCamera,
+    required List<MapMarker> markers,
+    required List<MapPolyline> polylines,
+    MapController? mapController,
+    UserLocationMarker? userLocationMarker,
+    required MapTheme theme,
+  }) {
+    // Build flutter_map widget with tile, marker, and polyline layers
+    // Accepts external MapController for shared camera control
+    // Maps domain entities to flutter_map equivalents
     return FlutterMap(
-      mapController: _mapController,
+      mapController: mapController,
       options: MapOptions(
-        initialCenter: _currentCameraPosition?.center.toLatLng() 
-          ?? const LatLng(0, 0),
-        initialZoom: _currentCameraPosition?.zoom ?? 15.0,
-        onTap: (_, point) => _onTap(point),
-        onLongPress: (_, point) => _onLongPress(point),
-        onPositionChanged: (position, hasGesture) => 
-          _onPositionChanged(position),
+        initialCenter: initialCamera.target.toFlutterMapLatLng(),
+        initialZoom: initialCamera.zoom,
       ),
       children: [
         TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          urlTemplate: theme.urlTemplate,
           userAgentPackageName: 'com.ridetogether.app',
         ),
-        MarkerLayer(markers: _buildFlutterMapMarkers()),
-        PolylineLayer(polylines: _buildFlutterMapPolylines()),
+        MarkerLayer(markers: _buildFlutterMapMarkers(markers)),
+        PolylineLayer(polylines: _buildFlutterMapPolylines(polylines)),
       ],
     );
   }
-  
-  @override
-  void moveCamera(CameraPosition position) {
-    _currentCameraPosition = position;
-    _mapController.move(position.center.toLatLng(), position.zoom);
-  }
-  
-  @override
-  void animateCamera(CameraPosition position, Duration duration) {
-    _currentCameraPosition = position;
-    _mapController.move(
-      position.center.toLatLng(), 
-      position.zoom,
-      duration: duration,
-    );
-  }
-  
-  @override
-  void addMarker(MapMarker marker) {
-    _markers.removeWhere((m) => m.id == marker.id);
-    _markers.add(marker);
-    _notifyMarkerChange();
-  }
-  
-  @override
-  void removeMarker(String markerId) {
-    _markers.removeWhere((m) => m.id == markerId);
-    _notifyMarkerChange();
-  }
-  
-  // ... other implementations
 }
 ```
 
@@ -583,6 +555,7 @@ class FlutterMapEngine implements MapEngine {
 | `entities/map_marker.dart` | Marker with position, icon, metadata |
 | `entities/map_polyline.dart` | Polyline with points, color, styling |
 | `entities/map_bounds.dart` | Visible map bounds (NE/SW corners) |
+| `entities/map_mode.dart` | Application map modes (`idle`, `searchingRide`, `activeRide`, `navigation`, `completedRide`) |
 | `entities/user_location_marker.dart` | Specialized user location data |
 | `repositories/map_provider.dart` | Map provider abstraction |
 
@@ -598,8 +571,17 @@ class FlutterMapEngine implements MapEngine {
 
 | File | Purpose |
 |------|---------|
-| `widgets/app_map.dart` | Main map widget, composes engine |
+| `widgets/app_map.dart` | Main map widget, composes engine, receives `MapController` |
+| `widgets/floating_map_controls.dart` | Export hub for all navbar widgets |
+| `widgets/navbar/floating_map_controls.dart` | Main FloatingMapControls widget with auto-hide and animation |
+| `widgets/navbar/bottom_nav_bar.dart` | Bottom nav bar with icon tiles and JoinRide pill |
+| `widgets/navbar/recenter_button.dart` | Circular Recenter button with `my_location` icon |
+| `widgets/navbar/nav_icon_button.dart` | Icon + label tile for nav bar actions |
+| `widgets/navbar/join_ride_pill.dart` | Primary-colored JoinRide call-to-action pill |
+| `widgets/navbar/nav_handle.dart` | Toggle handle for show/hide on the nav bar |
 | `providers/map_providers.dart` | Riverpod providers for map state |
+| `providers/map_mode_provider.dart` | `StateProvider<MapMode>` for current map mode |
+| `providers/map_controller_provider.dart` | `Provider<MapController>` for shared camera control |
 
 ---
 
@@ -730,4 +712,4 @@ log('MapEngine: added marker ${marker.id}', name: 'MapEngine');
 
 ---
 
-*Document Version 4.0 — Updated after Map Foundation completion.*
+*Document Version 5.0 — Updated after Floating Map Controls, MapMode, and MapController integration.*

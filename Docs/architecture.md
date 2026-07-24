@@ -1,7 +1,7 @@
 ﻿# RideTogether Architecture Documentation
 
-**Version:** 3.0  
-**Last Updated:** 2026-07-17
+**Version:** 4.1  
+**Last Updated:** 2026-07-23
 
 ---
 
@@ -19,7 +19,8 @@
 10. [Location Architecture](#location-architecture)
 11. [Authentication Architecture](#authentication-architecture)
 12. [Rider Identity Architecture](#rider-identity-architecture)
-13. [Ride Architecture (Future)](#ride-architecture-future)
+13. [Startup Architecture](#startup-architecture)
+14. [Ride Architecture (Future)](#ride-architecture-future)
 14. [External Provider Strategy](#external-provider-strategy)
 15. [Design Goals](#design-goals)
 16. [Development Roadmap](#development-roadmap)
@@ -429,59 +430,89 @@ class FirebaseAuthRepository implements AuthRepository {
 
 ```dart
 // lib/app/router/app_router.dart
-final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-  
-  return GoRouter(
-    initialLocation: '/splash',
-    redirect: (context, state) {
-      final isLoggedIn = authState.maybeWhen(
-        data: (user) => user != null,
-        orElse: () => false,
-      );
-      
-      final isAuthRoute = state.matchedLocation.startsWith('/login');
-      
-      if (!isLoggedIn && !isAuthRoute) return '/login';
-      if (isLoggedIn && isAuthRoute) return '/map';
-      return null;
-    },
-    routes: [
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/map',
-        builder: (context, state) => const MapScreen(),
-      ),
-      // Nested routes for ride features
-      GoRoute(
-        path: '/ride/:rideId',
-        builder: (context, state) {
-          final rideId = state.pathParameters['rideId']!;
-          return RideScreen(rideId: rideId);
-        },
-      ),
-    ],
-  );
-});
+abstract final class AppRouter {
+  static GoRouter createRouter(WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final startupState = ref.watch(startupProvider);
+    final refreshNotifier = RouterRefreshNotifier();
+
+    // Re-evaluate routes when auth or startup state changes
+    ref.listen(authStateProvider, (_, _) => refreshNotifier.refresh());
+    ref.listen(startupProvider, (_, _) => refreshNotifier.refresh());
+
+    return GoRouter(
+      initialLocation: AppRoutes.splash,
+      refreshListenable: refreshNotifier,
+      redirect: (context, state) {
+        final location = state.matchedLocation;
+        final startupResult = startupState.valueOrNull;
+
+        // Wait for startup
+        if (startupState.isLoading && startupResult == null) {
+          return AppRoutes.splash;
+        }
+
+        // Location permission has priority over authentication
+        if (startupResult is StartupLocationRequired) {
+          if (location != AppRoutes.locationRequired) {
+            return AppRoutes.locationRequired;
+          }
+          return null;
+        }
+
+        final isAuthenticated = authState.valueOrNull != null;
+
+        // Not logged in → login
+        if (!isAuthenticated && location != AppRoutes.login) {
+          return AppRoutes.login;
+        }
+
+        // Logged in but on splash/login → home
+        if (isAuthenticated && (location == AppRoutes.splash || location == AppRoutes.login)) {
+          return AppRoutes.home;
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+        GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+        GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+        GoRoute(path: '/location-required', builder: (_, __) {
+          final result = ref.read(startupProvider).valueOrNull;
+          if (result is StartupLocationRequired) {
+            return LocationRequiredScreen(status: result.status);
+          }
+          return const SplashScreen();
+        }),
+      ],
+    );
+  }
+}
 ```
 
 ### Navigation Patterns
 
 ```dart
 // Navigate with context
-context.go('/map');           // Replace stack
-context.push('/ride/123');    // Push on stack
-context.pop();                // Go back
+context.go('/home');              // Replace stack
+context.push('/ride/123');        // Push on stack
+context.pop();                    // Go back
 
 // Navigate with ref (outside build)
-ref.read(appRouterProvider).go('/map');
+ref.read(appRouterProvider).go('/home');
+```
+
+### Route Definitions
+
+```dart
+// lib/app/router/app_routes.dart
+abstract final class AppRoutes {
+  static const String splash = '/';
+  static const String login = '/login';
+  static const String home = '/home';
+  static const String locationRequired = '/location-required';
+}
 ```
 
 ---
@@ -581,13 +612,16 @@ The map system is **provider-agnostic**—the application communicates only with
 | `MapMarker` | Marker with position, icon, anchor, metadata |
 | `MapPolyline` | Polyline with points, color, width, pattern |
 | `MapBounds` | Visible map bounds (northeast, southwest) |
+| `MapMode` | Application map mode (`idle`, `searchingRide`, `activeRide`, `navigation`, `completedRide`) |
 | `UserLocationMarker` | Specialized marker for current user |
 
 ### Current Implementation
 
 - **Provider:** `flutter_map` + OpenStreetMap
 - **Engine:** `FlutterMapEngine` implements `MapEngine`
-- **Widget:** `AppMap` composes the engine
+- **Widget:** `AppMap` composes the engine, accepts `MapController` for external camera control
+- **Controllers:** `mapControllerProvider` (shared `MapController`), `mapModeProvider` (`StateProvider<MapMode>`)
+- **Overlays:** `FloatingMapControls` (navbar with auto-hide, Recenter button, JoinRide pill)
 
 ### Map Responsibilities
 
@@ -691,6 +725,72 @@ abstract class LocationRepository {
 - **Provider:** `geolocator` package
 - **Repository:** `GeolocatorLocationRepository`
 - **Features:** Live updates, permission handling, geocoding
+- **Permission flow:** Integrated into startup sequence via `startupProvider` → `StartupResult` → `LocationRequiredScreen`
+- **Lifecycle:** `AppLifecycleObserver` invalidates startup on resume to re-check permissions
+
+---
+
+## Startup Architecture
+
+### Purpose
+
+The startup flow determines whether the app is ready to show the main map experience. It validates location permissions before proceeding, rather than handling them reactively.
+
+### Flow
+
+```
+SplashScreen
+     │
+     ▼
+startupProvider (Future<StartupResult>)
+     │
+     ├── checks location permission (ensurePermissionGranted)
+     │
+     ├── StartupLocationRequired
+     │   └── LocationRequiredScreen
+     │       ├── Enable Location → requestPermission → invalidate startup
+     │       └── Open Settings → openAppSettings → on resume: AppLifecycleObserver invalidates startup
+     │
+     └── StartupReady
+         └── HomeScreen (map experience)
+```
+
+### StartupResult (Sealed Class)
+
+```dart
+// features/startup/domain/entities/startup_result.dart
+sealed class StartupResult {
+  const StartupResult();
+}
+
+class StartupReady extends StartupResult {
+  const StartupReady();
+}
+
+class StartupLocationRequired extends StartupResult {
+  final PermissionStatusEntity status;
+  const StartupLocationRequired(this.status);
+}
+```
+
+### AppLifecycleObserver
+
+```dart
+// core/providers/app_lifecycle_providers.dart
+class AppLifecycleObserver extends WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // On resume, re-check permissions
+    if (previous == paused && state == resumed) {
+      ref.invalidate(startupProvider);
+    }
+  }
+}
+```
+
+### Router Integration
+
+The router checks `StartupResult` in redirect logic. If `StartupLocationRequired`, it routes to `/location-required` regardless of authentication state.
 
 ---
 
@@ -699,19 +799,23 @@ abstract class LocationRepository {
 ### Flow
 
 ```
-Firebase Authentication
+App Startup
          │
          ▼
-Auth Repository (Interface)
+SplashScreen (startupProvider)
          │
-         ▼
-AppUser Entity (Domain)
-         │
-         ▼
-Auth Providers (Riverpod)
-         │
-         ▼
-UI (LoginScreen, Auth Guards)
+    ┌────┴────┐
+    ▼         ▼
+Ready    Location Required
+    │         │
+    ▼         ▼
+HomeScreen  LocationRequiredScreen
+                │
+                ▼
+            Open Settings / Request Permission
+                │
+                ▼
+        invalidate startupProvider → re-check
 ```
 
 ### Components
@@ -724,6 +828,9 @@ UI (LoginScreen, Auth Guards)
 | `AuthMapper` | `domain/mappers/` | Firebase User ↔ AppUser |
 | `AuthNotifier` | `presentation/providers/` | State management |
 | `LoginScreen` | `presentation/screens/` | UI for authentication |
+| `StartupResult` | `startup/domain/entities/` | Sealed class (`StartupReady` / `StartupLocationRequired`) |
+| `LocationRequiredScreen` | `location/presentation/screens/` | Permission gate screen |
+| `AppLifecycleObserver` | `core/providers/` | Re-checks permissions on app resume |
 
 ### Supported Methods
 
@@ -951,7 +1058,7 @@ The RideTogether architecture should:
 
 ## Development Roadmap
 
-### Current Status: v0.0.4 — Map Foundation Complete ✅
+### Current Status: v0.3 — Map Experience Complete ✅
 
 ```
 Application Foundation ✅
@@ -966,21 +1073,21 @@ Rider Identity ✅
 Map Foundation ✅
          │
          ▼
-Map Experience 🔄 NEXT
+Map Experience ✅
          │
          ▼
-Ride System
+Ride System 🔄 NEXT
          │
          ▼
 Live Ride Experience
 ```
 
-### Phase 1: Map Experience (v0.3)
+### Phase 1: Map Experience (v0.3) ✅
 
-- [ ] `MapScreen` as main application screen
-- [ ] Floating map controls (Join Ride, Profile, Settings, Recenter)
-- [ ] Map modes (idle, searchingRide, activeRide, navigation, completedRide)
-- [ ] Camera controls and state management
+- [x] Map-first `HomeScreen` (no separate `MapScreen`)
+- [x] Floating map controls (navbar with auto-hide, Recenter button, JoinRide pill)
+- [x] Map modes (`idle`, `searchingRide`, `activeRide`, `navigation`, `completedRide`)
+- [x] Camera state management via `mapControllerProvider` and `mapModeProvider`
 
 ### Phase 2: Ride Foundation (v0.4)
 
@@ -1060,12 +1167,18 @@ Journey (Shared Platform)
 | Application entry | `lib/main.dart` |
 | App configuration | `lib/app/app.dart` |
 | Routing | `lib/app/router/app_router.dart` |
+| Route paths | `lib/app/router/app_routes.dart` |
 | Theme system | `lib/core/theme/` |
+| App lifecycle | `lib/core/providers/app_lifecycle_providers.dart` |
 | Authentication | `lib/features/auth/` |
 | Rider profile | `lib/features/profile/` |
 | Startup/Splash | `lib/features/startup/` |
+| Startup result | `lib/features/startup/domain/entities/startup_result.dart` |
 | Map | `lib/features/map/` |
+| Map floating controls | `lib/features/map/presentation/widgets/navbar/` |
 | Location | `lib/features/location/` |
+| Location required screen | `lib/features/location/presentation/screens/location_required_screen.dart` |
+| Home screen | `lib/features/home/presentation/screens/home_screen.dart` |
 | Ride (future) | `lib/features/ride/` |
 | Firebase config | `lib/firebase_options.dart` |
 

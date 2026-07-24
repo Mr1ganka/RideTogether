@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ride_together/app/router/app_router.dart';
+import 'package:ride_together/core/providers/app_lifeCycle_providers.dart';
 import 'package:ride_together/core/theme/app_theme.dart';
 
 
@@ -14,6 +15,7 @@ class RideTogetherApp extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
+    ref.watch(appLifecycleProvider);
 
     return MaterialApp.router(
 

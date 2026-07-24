@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ride_together/features/map/domain/entities/map_theme.dart';
 
@@ -9,7 +10,6 @@ import '../../domain/entities/map_polyline.dart';
 import '../providers/map_engine_provider.dart';
 import '../providers/user_marker_provider.dart';
 
-
 class AppMap extends ConsumerWidget {
 
   const AppMap({
@@ -17,6 +17,7 @@ class AppMap extends ConsumerWidget {
     this.initialCamera,
     this.markers = const [],
     this.polylines = const [],
+    required this.mapController,
   });
 
 
@@ -26,6 +27,7 @@ class AppMap extends ConsumerWidget {
 
   final List<MapPolyline> polylines;
 
+  final MapController mapController;
 
 @override
 Widget build(BuildContext context, WidgetRef ref) {
@@ -64,6 +66,7 @@ Widget build(BuildContext context, WidgetRef ref) {
 
     theme: mapTheme,
     userLocationMarker: userLocationMarker,
-  );
-}
+    mapController: mapController,
+    );
+  }
 }

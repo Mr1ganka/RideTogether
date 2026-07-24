@@ -76,4 +76,11 @@ abstract final class AppSpacing {
 
   /// Bottom sheet internal padding.
   static const double bottomSheetPadding = 20.0;
+
+  // ---------------------------------------------------------------------------
+  // Map Control Spacing
+  // ---------------------------------------------------------------------------
+
+  /// Extra bottom padding for the bottom nav bar.
+  static const double bottomNavAir = 2.0;
 }
