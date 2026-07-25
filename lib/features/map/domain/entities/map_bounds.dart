@@ -4,8 +4,5 @@ class MapBounds {
   final GeoPoint northEast;
   final GeoPoint southWest;
 
-  const MapBounds({
-    required this.northEast,
-    required this.southWest,
-  });
+  const MapBounds({required this.northEast, required this.southWest});
 }

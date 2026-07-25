@@ -5,9 +5,7 @@ import '../../domain/entities/permission_status_entity.dart';
 class PermissionMapper {
   const PermissionMapper._();
 
-  static PermissionStatusEntity toEntity(
-    LocationPermission permission,
-  ) {
+  static PermissionStatusEntity toEntity(LocationPermission permission) {
     switch (permission) {
       case LocationPermission.always:
       case LocationPermission.whileInUse:

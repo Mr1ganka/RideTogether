@@ -74,15 +74,16 @@ class _DirectionIndicatorState extends State<DirectionIndicator>
 
     final end = _currentHeading + difference;
 
-    _rotationAnimation = Tween<double>(
-      begin: _degreesToRadians(_currentHeading),
-      end: _degreesToRadians(end),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: LocationMarkerConstants.headingAnimationCurve,
-      ),
-    );
+    _rotationAnimation =
+        Tween<double>(
+          begin: _degreesToRadians(_currentHeading),
+          end: _degreesToRadians(end),
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: LocationMarkerConstants.headingAnimationCurve,
+          ),
+        );
 
     _controller.forward(from: 0).then((_) {
       if (mounted) {

@@ -7,7 +7,6 @@ import '../entities/map_marker.dart';
 import '../entities/map_polyline.dart';
 import '../entities/user_location_marker.dart';
 
-
 abstract interface class MapEngine {
   Widget buildMap({
     required CameraPosition initialCamera,

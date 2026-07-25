@@ -4,8 +4,5 @@ class MapMarker {
   final String id;
   final GeoPoint position;
 
-  const MapMarker({
-    required this.id,
-    required this.position,
-  });
+  const MapMarker({required this.id, required this.position});
 }

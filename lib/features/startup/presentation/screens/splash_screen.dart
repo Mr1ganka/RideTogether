@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({
-    super.key,
-  });
-
+  const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +9,7 @@ class SplashScreen extends StatelessWidget {
       body: Center(
         child: Text(
           'RideTogether',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
     );

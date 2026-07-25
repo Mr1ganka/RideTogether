@@ -11,7 +11,6 @@ import '../providers/map_engine_provider.dart';
 import '../providers/user_marker_provider.dart';
 
 class AppMap extends ConsumerWidget {
-
   const AppMap({
     super.key,
     this.initialCamera,
@@ -19,7 +18,6 @@ class AppMap extends ConsumerWidget {
     this.polylines = const [],
     required this.mapController,
   });
-
 
   final CameraPosition? initialCamera;
 
@@ -29,44 +27,33 @@ class AppMap extends ConsumerWidget {
 
   final MapController mapController;
 
-@override
-Widget build(BuildContext context, WidgetRef ref) {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mapEngine = ref.watch(mapEngineProvider);
 
-  final mapEngine =
-      ref.watch(mapEngineProvider);
+    final userLocationMarker = ref.watch(userLocationMarkerProvider);
 
-  final userLocationMarker =
-      ref.watch(userLocationMarkerProvider);
+    final brightness = Theme.of(context).brightness;
 
+    final mapTheme = brightness == Brightness.dark
+        ? MapTheme.dark
+        : MapTheme.light;
 
-  final brightness =
-      Theme.of(context).brightness;
-
-
-  final mapTheme =
-      brightness == Brightness.dark
-          ? MapTheme.dark
-          : MapTheme.light;
-
-
-  return mapEngine.buildMap(
-    initialCamera:
-        initialCamera ??
-        const CameraPosition(
-          target: GeoPoint(
-            latitude: 0,
-            longitude: 0,
+    return mapEngine.buildMap(
+      initialCamera:
+          initialCamera ??
+          const CameraPosition(
+            target: GeoPoint(latitude: 0, longitude: 0),
+            zoom: 2,
           ),
-          zoom: 2,
-        ),
 
-    markers: markers,
+      markers: markers,
 
-    polylines: polylines,
+      polylines: polylines,
 
-    theme: mapTheme,
-    userLocationMarker: userLocationMarker,
-    mapController: mapController,
+      theme: mapTheme,
+      userLocationMarker: userLocationMarker,
+      mapController: mapController,
     );
   }
 }

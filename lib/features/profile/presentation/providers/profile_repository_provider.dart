@@ -5,19 +5,14 @@ import '../../data/datasource/profile_remote_datasource.dart';
 import '../../data/repositories/firebase_profile_repository.dart';
 import '../../domain/repositories/profile_repository.dart';
 
-
-final profileRemoteDataSourceProvider =
-    Provider<ProfileRemoteDataSource>((ref) {
-  return FirebaseProfileRemoteDataSource(
-    firestore: FirebaseFirestore.instance,
-  );
+final profileRemoteDataSourceProvider = Provider<ProfileRemoteDataSource>((
+  ref,
+) {
+  return FirebaseProfileRemoteDataSource(firestore: FirebaseFirestore.instance);
 });
 
-
-final profileRepositoryProvider =
-    Provider<ProfileRepository>((ref) {
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return FirebaseProfileRepository(
-    remoteDataSource:
-        ref.read(profileRemoteDataSourceProvider),
+    remoteDataSource: ref.read(profileRemoteDataSourceProvider),
   );
 });

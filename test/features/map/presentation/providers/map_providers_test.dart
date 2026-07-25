@@ -43,12 +43,15 @@ void main() {
       expect(engine, isNotNull);
     });
 
-    test('userMarkerProvider returns null when position is loading or null', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
+    test(
+      'userMarkerProvider returns null when position is loading or null',
+      () {
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
 
-      final marker = container.read(userMarkerProvider);
-      expect(marker, isNull);
-    });
+        final marker = container.read(userMarkerProvider);
+        expect(marker, isNull);
+      },
+    );
   });
 }

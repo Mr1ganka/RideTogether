@@ -4,13 +4,16 @@ import 'package:ride_together/features/location/domain/entities/permission_statu
 void main() {
   group('PermissionStatusEntity', () {
     test('enum contains expected values', () {
-      expect(PermissionStatusEntity.values, containsAll([
-        PermissionStatusEntity.unknown,
-        PermissionStatusEntity.granted,
-        PermissionStatusEntity.denied,
-        PermissionStatusEntity.permanentlyDenied,
-        PermissionStatusEntity.serviceDisabled,
-      ]));
+      expect(
+        PermissionStatusEntity.values,
+        containsAll([
+          PermissionStatusEntity.unknown,
+          PermissionStatusEntity.granted,
+          PermissionStatusEntity.denied,
+          PermissionStatusEntity.permanentlyDenied,
+          PermissionStatusEntity.serviceDisabled,
+        ]),
+      );
     });
   });
 }

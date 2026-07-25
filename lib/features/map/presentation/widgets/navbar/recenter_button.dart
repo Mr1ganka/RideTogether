@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RecenterButton extends StatelessWidget {
-  const RecenterButton({
-    required this.onTap,
-    super.key,
-  });
+  const RecenterButton({required this.onTap, super.key});
 
   final VoidCallback onTap;
 

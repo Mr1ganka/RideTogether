@@ -8,20 +8,23 @@ import 'package:ride_together/features/startup/presentation/providers/startup_pr
 class MockRef extends Mock implements Ref {}
 
 void main() {
-  test('AppLifecycleObserver invalidates startupProvider on resume from paused state', () {
-    final ref = MockRef();
-    final observer = AppLifecycleObserver(ref);
+  test(
+    'AppLifecycleObserver invalidates startupProvider on resume from paused state',
+    () {
+      final ref = MockRef();
+      final observer = AppLifecycleObserver(ref);
 
-    // Initially resumed
-    observer.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      // Initially resumed
+      observer.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-    // Pause app
-    observer.didChangeAppLifecycleState(AppLifecycleState.paused);
-    verifyNever(() => ref.invalidate(startupProvider));
+      // Pause app
+      observer.didChangeAppLifecycleState(AppLifecycleState.paused);
+      verifyNever(() => ref.invalidate(startupProvider));
 
-    // Resume app from paused state
-    observer.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      // Resume app from paused state
+      observer.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-    verify(() => ref.invalidate(startupProvider)).called(1);
-  });
+      verify(() => ref.invalidate(startupProvider)).called(1);
+    },
+  );
 }

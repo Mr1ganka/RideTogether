@@ -2,10 +2,7 @@ class GeoPoint {
   final double latitude;
   final double longitude;
 
-  const GeoPoint({
-    required this.latitude,
-    required this.longitude,
-  });
+  const GeoPoint({required this.latitude, required this.longitude});
 
   @override
   bool operator ==(Object other) =>
@@ -20,3 +17,4 @@ class GeoPoint {
   @override
   String toString() => 'GeoPoint($latitude, $longitude)';
 }
+

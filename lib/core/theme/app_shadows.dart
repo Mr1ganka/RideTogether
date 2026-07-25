@@ -20,11 +20,7 @@ abstract final class AppShadows {
   /// - Chips
   /// - Compact surfaces
   static const List<BoxShadow> sm = [
-    BoxShadow(
-      color: Colors.black26,
-      blurRadius: 4,
-      offset: Offset(0, 2),
-    ),
+    BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
   ];
 
   /// Medium elevation shadow.
@@ -33,11 +29,7 @@ abstract final class AppShadows {
   /// - Cards
   /// - Floating elements
   static const List<BoxShadow> md = [
-    BoxShadow(
-      color: Colors.black38,
-      blurRadius: 8,
-      offset: Offset(0, 4),
-    ),
+    BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, 4)),
   ];
 
   /// Large elevation shadow.
@@ -47,11 +39,7 @@ abstract final class AppShadows {
   /// - Bottom sheets
   /// - Large floating surfaces
   static const List<BoxShadow> lg = [
-    BoxShadow(
-      color: Colors.black45,
-      blurRadius: 16,
-      offset: Offset(0, 8),
-    ),
+    BoxShadow(color: Colors.black45, blurRadius: 16, offset: Offset(0, 8)),
   ];
 
   // ---------------------------------------------------------------------------
@@ -63,20 +51,12 @@ abstract final class AppShadows {
 
   /// Floating action button shadow.
   static const List<BoxShadow> floating = [
-    BoxShadow(
-      color: Colors.black54,
-      blurRadius: 12,
-      offset: Offset(0, 6),
-    ),
+    BoxShadow(color: Colors.black54, blurRadius: 12, offset: Offset(0, 6)),
   ];
 
   /// Bottom sheet shadow.
   static const List<BoxShadow> bottomSheet = [
-    BoxShadow(
-      color: Colors.black54,
-      blurRadius: 20,
-      offset: Offset(0, -6),
-    ),
+    BoxShadow(color: Colors.black54, blurRadius: 20, offset: Offset(0, -6)),
   ];
 
   /// Dialog shadow.

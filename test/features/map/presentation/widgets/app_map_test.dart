@@ -11,9 +11,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
-          home: Scaffold(
-            body: AppMap(mapController: mapController),
-          ),
+          home: Scaffold(body: AppMap(mapController: mapController)),
         ),
       ),
     );

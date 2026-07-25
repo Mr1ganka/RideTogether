@@ -6,11 +6,6 @@ import 'package:ride_together/features/auth/presentation/providers/auth_reposito
 import 'package:ride_together/features/map/domain/entities/map_mode.dart';
 import 'package:ride_together/features/map/presentation/providers/map_mode_provider.dart';
 import 'package:ride_together/features/map/presentation/widgets/floating_map_controls.dart';
-import 'package:ride_together/features/map/presentation/widgets/navbar/bottom_nav_bar.dart';
-import 'package:ride_together/features/map/presentation/widgets/navbar/join_ride_pill.dart';
-import 'package:ride_together/features/map/presentation/widgets/navbar/nav_handle.dart';
-import 'package:ride_together/features/map/presentation/widgets/navbar/nav_icon_button.dart';
-import 'package:ride_together/features/map/presentation/widgets/navbar/recenter_button.dart';
 
 import '../../../../helpers/fake_auth_repository.dart';
 
@@ -27,9 +22,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-          ],
+          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
           child: MaterialApp(
             home: Scaffold(
               body: FloatingMapControls(mapController: mapController),
@@ -68,9 +61,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(fakeAuth),
-          ],
+          overrides: [authRepositoryProvider.overrideWithValue(fakeAuth)],
           child: MaterialApp(
             home: Scaffold(
               body: FloatingMapControls(mapController: mapController),

@@ -8,24 +8,19 @@ import '../models/app_user_model.dart';
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
 
-  FirebaseAuthRepository({
-    FirebaseAuth? firebaseAuth,
-  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
-
+  FirebaseAuthRepository({FirebaseAuth? firebaseAuth})
+    : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
 
   @override
   Stream<AppUser?> authStateChanges() {
-    return _firebaseAuth.authStateChanges().map(
-      (firebaseUser) {
-        if (firebaseUser == null) {
-          return null;
-        }
+    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      if (firebaseUser == null) {
+        return null;
+      }
 
-        return AppUserModel.fromFirebaseUser(firebaseUser);
-      },
-    );
+      return AppUserModel.fromFirebaseUser(firebaseUser);
+    });
   }
-
 
   @override
   AppUser? get currentUser {
@@ -38,54 +33,39 @@ class FirebaseAuthRepository implements AuthRepository {
     return AppUserModel.fromFirebaseUser(user);
   }
 
-
   @override
-Future<AppUser?> signInWithGoogle() async {
-  try {
+  Future<AppUser?> signInWithGoogle() async {
+    try {
       final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
+      await googleSignIn.initialize(
+        serverClientId:
+            '228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com',
+      );
 
-    await googleSignIn.initialize(
-      serverClientId:
-          '228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com',
-    );
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-    final GoogleSignInAccount googleUser =
-        await googleSignIn.authenticate();
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
 
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
 
-    final GoogleSignInAuthentication googleAuth =
-        googleUser.authentication;
+      final firebaseUser = userCredential.user;
 
+      if (firebaseUser == null) {
+        return null;
+      }
 
-    final credential =
-        GoogleAuthProvider.credential(
-          idToken: googleAuth.idToken,
-        );
-
-
-    final userCredential =
-        await _firebaseAuth.signInWithCredential(
-          credential,
-    );
-
-
-    final firebaseUser = userCredential.user;
-
-
-    if (firebaseUser == null) {
-      return null;
+      return AppUserModel.fromFirebaseUser(firebaseUser);
+    } catch (e) {
+      rethrow;
     }
-
-
-    return AppUserModel.fromFirebaseUser(firebaseUser);
-
-  } catch (e) {
-    rethrow;
   }
-}
-
 
   @override
   Future<void> signOut() async {

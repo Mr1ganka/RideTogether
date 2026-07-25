@@ -12,29 +12,38 @@ import '../../helpers/fake_auth_repository.dart';
 
 void main() {
   group('AppRouter', () {
-    testWidgets('redirects to locationRequired when startup returns locationRequired', (tester) async {
-      final repository = FakeAuthRepository();
+    testWidgets(
+      'redirects to locationRequired when startup returns locationRequired',
+      (tester) async {
+        final repository = FakeAuthRepository();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(repository),
-            startupProvider.overrideWith((ref) async => const StartupLocationRequired(PermissionStatusEntity.denied)),
-          ],
-          child: Consumer(
-            builder: (context, ref, _) {
-              final router = AppRouter.createRouter(ref as WidgetRef);
-              return MaterialApp.router(routerConfig: router);
-            },
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              authRepositoryProvider.overrideWithValue(repository),
+              startupProvider.overrideWith(
+                (ref) async => const StartupLocationRequired(
+                  PermissionStatusEntity.denied,
+                ),
+              ),
+            ],
+            child: Consumer(
+              builder: (context, ref, _) {
+                final router = AppRouter.createRouter(ref);
+                return MaterialApp.router(routerConfig: router);
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      expect(find.text('Location access needed'), findsOneWidget);
-    });
+        await tester.pumpAndSettle();
+        expect(find.text('Location access needed'), findsOneWidget);
+      },
+    );
 
-    testWidgets('redirects to login when unauthenticated and startup ready', (tester) async {
+    testWidgets('redirects to login when unauthenticated and startup ready', (
+      tester,
+    ) async {
       final repository = FakeAuthRepository();
 
       await tester.pumpWidget(
@@ -45,7 +54,7 @@ void main() {
           ],
           child: Consumer(
             builder: (context, ref, _) {
-              final router = AppRouter.createRouter(ref as WidgetRef);
+              final router = AppRouter.createRouter(ref);
               return MaterialApp.router(routerConfig: router);
             },
           ),
@@ -56,7 +65,9 @@ void main() {
       expect(find.text('Continue with Google'), findsOneWidget);
     });
 
-    testWidgets('redirects to home when authenticated and startup ready', (tester) async {
+    testWidgets('redirects to home when authenticated and startup ready', (
+      tester,
+    ) async {
       final repository = FakeAuthRepository(
         initialUser: const AppUser(id: 'user-10'),
       );
@@ -69,7 +80,7 @@ void main() {
           ],
           child: Consumer(
             builder: (context, ref, _) {
-              final router = AppRouter.createRouter(ref as WidgetRef);
+              final router = AppRouter.createRouter(ref);
               return MaterialApp.router(routerConfig: router);
             },
           ),

@@ -5,44 +5,24 @@ import '../../domain/entities/rider_profile.dart';
 import '../../domain/mappers/rider_profile_mapper.dart';
 import 'profile_repository_provider.dart';
 
-
-final currentProfileProvider =
-    FutureProvider<RiderProfile?>((ref) async {
-
-  final authUser =
-      await ref.watch(authStateProvider.future);
-
+final currentProfileProvider = FutureProvider<RiderProfile?>((ref) async {
+  final authUser = await ref.watch(authStateProvider.future);
 
   if (authUser == null) {
     return null;
   }
 
+  final repository = ref.read(profileRepositoryProvider);
 
-  final repository =
-      ref.read(profileRepositoryProvider);
-
-
-  final existingProfile =
-      await repository.getProfile(
-        authUser.id,
-      );
-
+  final existingProfile = await repository.getProfile(authUser.id);
 
   if (existingProfile != null) {
     return existingProfile;
   }
 
+  final newProfile = RiderProfileMapper.fromAppUser(authUser);
 
-  final newProfile =
-      RiderProfileMapper.fromAppUser(
-        authUser,
-      );
-
-
-  await repository.createProfile(
-    newProfile,
-  );
-
+  await repository.createProfile(newProfile);
 
   return newProfile;
 });

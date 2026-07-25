@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -10,7 +9,10 @@ class DirectionConePainterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: const Size(AppColors.directionConeSize, AppColors.directionConeSize),
+      size: const Size(
+        AppColors.directionConeSize,
+        AppColors.directionConeSize,
+      ),
       painter: const DirectionConePainter(),
     );
   }
@@ -19,9 +21,7 @@ class DirectionConePainterWidget extends StatelessWidget {
 class DirectionConePainter extends CustomPainter {
   final Color color;
 
-  const DirectionConePainter({
-    this.color = AppColors.directionConeBeam,
-  });
+  const DirectionConePainter({this.color = AppColors.directionConeBeam});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -35,11 +35,14 @@ class DirectionConePainter extends CustomPainter {
     // North / Up is -90 degrees (-pi/2)
     const startAngleDeg = -90.0 - (sweepAngleDeg / 2.0);
     const startAngleRad = startAngleDeg * (math.pi / 180.0);
+    const endAngleRad = startAngleRad + sweepAngleRad;
+
+    final circleRect = Rect.fromCircle(center: center, radius: radius);
 
     final beamPath = Path()
       ..moveTo(center.dx, center.dy)
       ..arcTo(
-        Rect.fromCircle(center: center, radius: radius),
+        circleRect,
         startAngleRad,
         sweepAngleRad,
         false,
@@ -47,23 +50,55 @@ class DirectionConePainter extends CustomPainter {
       ..lineTo(center.dx, center.dy)
       ..close();
 
-    final circleRect = Rect.fromCircle(center: center, radius: radius);
-
-    final paint = Paint()
+    // 1. Soft blurred fill towards the middle
+    final fillPaint = Paint()
       ..shader = RadialGradient(
         center: Alignment.center,
         radius: 1.0,
         colors: [
-          color.withValues(alpha: 0.85),
-          color.withValues(alpha: 0.50),
-          color.withValues(alpha: 0.15),
+          color.withValues(alpha: 0.75),
+          color.withValues(alpha: 0.35),
+          color.withValues(alpha: 0.05),
         ],
-        stops: const [0.0, 0.45, 1.0],
+        stops: const [0.0, 0.5, 1.0],
       ).createShader(circleRect)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.5)
       ..isAntiAlias = true;
 
-    canvas.drawPath(beamPath, paint);
+    canvas.drawPath(beamPath, fillPaint);
+
+    // 2. Prominent side edges
+    final leftRayEnd = Offset(
+      center.dx + radius * math.cos(startAngleRad),
+      center.dy + radius * math.sin(startAngleRad),
+    );
+    final rightRayEnd = Offset(
+      center.dx + radius * math.cos(endAngleRad),
+      center.dy + radius * math.sin(endAngleRad),
+    );
+
+    final edgePath = Path()
+      ..moveTo(center.dx, center.dy)
+      ..lineTo(leftRayEnd.dx, leftRayEnd.dy)
+      ..moveTo(center.dx, center.dy)
+      ..lineTo(rightRayEnd.dx, rightRayEnd.dy);
+
+    final edgePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round
+      ..shader = LinearGradient(
+        begin: Alignment.center,
+        end: Alignment.topCenter,
+        colors: [
+          color.withValues(alpha: 0.95),
+          color.withValues(alpha: 0.45),
+        ],
+      ).createShader(circleRect)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8)
+      ..isAntiAlias = true;
+
+    canvas.drawPath(edgePath, edgePaint);
   }
 
   @override
@@ -71,4 +106,3 @@ class DirectionConePainter extends CustomPainter {
     return oldDelegate.color != color;
   }
 }
-

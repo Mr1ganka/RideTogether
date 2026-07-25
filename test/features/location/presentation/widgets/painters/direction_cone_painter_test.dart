@@ -6,11 +6,7 @@ void main() {
   testWidgets('DirectionConePainterWidget renders CustomPaint', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: DirectionConePainterWidget(),
-          ),
-        ),
+        home: Scaffold(body: Center(child: DirectionConePainterWidget())),
       ),
     );
 

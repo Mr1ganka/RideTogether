@@ -8,7 +8,9 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   group('AppTextStyles', () {
-    testWidgets('textTheme is defined with expected font sizes', (tester) async {
+    testWidgets('textTheme is defined with expected font sizes', (
+      tester,
+    ) async {
       await tester.pumpWidget(const MaterialApp(home: SizedBox()));
 
       expect(AppTextStyles.displayLarge.fontSize, 57);

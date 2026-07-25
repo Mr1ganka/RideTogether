@@ -1,4 +1,1 @@
-enum MapTheme {
-  light,
-  dark,
-}
+enum MapTheme { light, dark }

@@ -9,21 +9,15 @@ class RiderProfileModel extends RiderProfile {
     required super.updatedAt,
   });
 
-
-  factory RiderProfileModel.fromMap(
-    Map<String, dynamic> map,
-  ) {
+  factory RiderProfileModel.fromMap(Map<String, dynamic> map) {
     return RiderProfileModel(
       id: map['id'] as String,
       displayName: map['displayName'] as String,
       photoUrl: map['photoUrl'] as String?,
-      createdAt:
-          (map['createdAt'] as dynamic).toDate(),
-      updatedAt:
-          (map['updatedAt'] as dynamic).toDate(),
+      createdAt: (map['createdAt'] as dynamic).toDate(),
+      updatedAt: (map['updatedAt'] as dynamic).toDate(),
     );
   }
-
 
   Map<String, dynamic> toMap() {
     return {
@@ -35,10 +29,7 @@ class RiderProfileModel extends RiderProfile {
     };
   }
 
-
-  factory RiderProfileModel.fromEntity(
-    RiderProfile profile,
-  ) {
+  factory RiderProfileModel.fromEntity(RiderProfile profile) {
     return RiderProfileModel(
       id: profile.id,
       displayName: profile.displayName,

@@ -61,8 +61,7 @@ class LocationPermissionNotifier extends AsyncNotifier<PermissionStatusEntity> {
   }
 
   bool get shouldOpenSettings {
-  return hasRequestedPermission &&
-      state.value == PermissionStatusEntity.denied;
-}
-
+    return hasRequestedPermission &&
+        state.value == PermissionStatusEntity.denied;
+  }
 }

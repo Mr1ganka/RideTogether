@@ -62,7 +62,6 @@ abstract final class AppTheme {
       // -----------------------------------------------------------------------
       // Color System
       // -----------------------------------------------------------------------
-
       brightness: brightness,
 
       scaffoldBackgroundColor: background,
@@ -79,7 +78,6 @@ abstract final class AppTheme {
       // -----------------------------------------------------------------------
       // Typography
       // -----------------------------------------------------------------------
-
       textTheme: AppTextStyles.textTheme.apply(
         bodyColor: textPrimary,
         displayColor: textPrimary,
@@ -94,9 +92,7 @@ abstract final class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.card,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.card),
         ),
       ),
 
@@ -104,9 +100,7 @@ abstract final class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.dialog,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.dialog),
         ),
       ),
 
@@ -115,9 +109,7 @@ abstract final class AppTheme {
         backgroundColor: surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(
-              AppRadius.bottomSheet,
-            ),
+            top: Radius.circular(AppRadius.bottomSheet),
           ),
         ),
       ),
@@ -127,9 +119,7 @@ abstract final class AppTheme {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.fab,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.fab),
         ),
       ),
 
@@ -138,14 +128,9 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
-          minimumSize: const Size(
-            double.infinity,
-            52,
-          ),
+          minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              AppRadius.button,
-            ),
+            borderRadius: BorderRadius.circular(AppRadius.button),
           ),
         ),
       ),
@@ -156,44 +141,30 @@ abstract final class AppTheme {
         fillColor: surface,
 
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.input,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.input),
           borderSide: BorderSide.none,
         ),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.input,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.input),
           borderSide: BorderSide.none,
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.input,
-          ),
-          borderSide: BorderSide(
-            color: AppColors.primary,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.input),
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
 
       // Divider
-      dividerTheme: DividerThemeData(
-        color: divider,
-      ),
+      dividerTheme: DividerThemeData(color: divider),
 
       // Snackbars
       snackBarTheme: SnackBarThemeData(
         backgroundColor: surfaceVariant,
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
-          color: textPrimary,
-        ),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: textPrimary),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppRadius.md,
-          ),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
 
@@ -204,15 +175,9 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTextStyles.titleLarge.copyWith(
-          color: textPrimary,
-        ),
-        iconTheme: IconThemeData(
-          color: textPrimary,
-        ),
-        actionsIconTheme: IconThemeData(
-          color: textPrimary,
-        ),
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: textPrimary),
+        iconTheme: IconThemeData(color: textPrimary),
+        actionsIconTheme: IconThemeData(color: textPrimary),
       ),
     );
   }

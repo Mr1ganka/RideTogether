@@ -6,13 +6,13 @@ import 'package:ride_together/features/location/presentation/screens/location_re
 
 void main() {
   group('LocationRequiredScreen', () {
-    testWidgets('renders location required info for denied status', (tester) async {
+    testWidgets('renders location required info for denied status', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
-            home: LocationRequiredScreen(
-              status: PermissionStatusEntity.denied,
-            ),
+            home: LocationRequiredScreen(status: PermissionStatusEntity.denied),
           ),
         ),
       );
@@ -22,7 +22,9 @@ void main() {
       expect(find.byIcon(Icons.location_on), findsOneWidget);
     });
 
-    testWidgets('renders open settings button for permanentlyDenied status', (tester) async {
+    testWidgets('renders open settings button for permanentlyDenied status', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(

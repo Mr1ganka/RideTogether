@@ -27,9 +27,9 @@ abstract final class LocationMarkerConstants {
 
   static const Color dotBlue = Color(0xFF1A73E8);
 
-  static const Duration headingAnimationDuration = Duration(milliseconds: 120);
+  static const Duration headingAnimationDuration = Duration(milliseconds: 300);
 
-  static const Curve headingAnimationCurve = Curves.easeOutCubic;
+  static const Curve headingAnimationCurve = Curves.easeInOutCubic;
 
   // Direction cone.
   static const double coneCanvasSize = 60;

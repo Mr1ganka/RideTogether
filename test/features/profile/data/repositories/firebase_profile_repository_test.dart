@@ -5,7 +5,8 @@ import 'package:ride_together/features/profile/data/model/rider_profile_model.da
 import 'package:ride_together/features/profile/data/repositories/firebase_profile_repository.dart';
 import 'package:ride_together/features/profile/domain/entities/rider_profile.dart';
 
-class MockProfileRemoteDataSource extends Mock implements ProfileRemoteDataSource {}
+class MockProfileRemoteDataSource extends Mock
+    implements ProfileRemoteDataSource {}
 
 void main() {
   setUpAll(() {
@@ -22,7 +23,9 @@ void main() {
   group('FirebaseProfileRepository', () {
     test('delegates getProfile to remoteDataSource', () async {
       final dataSource = MockProfileRemoteDataSource();
-      final repository = FirebaseProfileRepository(remoteDataSource: dataSource);
+      final repository = FirebaseProfileRepository(
+        remoteDataSource: dataSource,
+      );
 
       final now = DateTime.now();
       final model = RiderProfileModel(
@@ -39,26 +42,31 @@ void main() {
       verify(() => dataSource.getProfile('u1')).called(1);
     });
 
-    test('delegates createProfile and updateProfile to remoteDataSource', () async {
-      final dataSource = MockProfileRemoteDataSource();
-      final repository = FirebaseProfileRepository(remoteDataSource: dataSource);
+    test(
+      'delegates createProfile and updateProfile to remoteDataSource',
+      () async {
+        final dataSource = MockProfileRemoteDataSource();
+        final repository = FirebaseProfileRepository(
+          remoteDataSource: dataSource,
+        );
 
-      final now = DateTime.now();
-      final profile = RiderProfile(
-        id: 'u2',
-        displayName: 'Rider 2',
-        createdAt: now,
-        updatedAt: now,
-      );
+        final now = DateTime.now();
+        final profile = RiderProfile(
+          id: 'u2',
+          displayName: 'Rider 2',
+          createdAt: now,
+          updatedAt: now,
+        );
 
-      when(() => dataSource.createProfile(any())).thenAnswer((_) async {});
-      when(() => dataSource.updateProfile(any())).thenAnswer((_) async {});
+        when(() => dataSource.createProfile(any())).thenAnswer((_) async {});
+        when(() => dataSource.updateProfile(any())).thenAnswer((_) async {});
 
-      await repository.createProfile(profile);
-      verify(() => dataSource.createProfile(any())).called(1);
+        await repository.createProfile(profile);
+        verify(() => dataSource.createProfile(any())).called(1);
 
-      await repository.updateProfile(profile);
-      verify(() => dataSource.updateProfile(any())).called(1);
-    });
+        await repository.updateProfile(profile);
+        verify(() => dataSource.updateProfile(any())).called(1);
+      },
+    );
   });
 }

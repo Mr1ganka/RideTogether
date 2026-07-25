@@ -21,6 +21,9 @@ class UserLocationMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Location accuracy is uncertain / searching if accuracy is null or > 20 meters.
+    final isUncertain = marker.accuracy == null || marker.accuracy! > 20.0;
+
     return SizedBox(
       width: LocationMarkerConstants.markerSize,
 
@@ -32,9 +35,11 @@ class UserLocationMarker extends StatelessWidget {
         clipBehavior: Clip.none,
 
         children: [
-          // Background GPS accuracy visualization.
-          if (marker.accuracy != null && marker.accuracy! > 0)
-            AccuracyCircle(radius: _calculateRadius(marker.accuracy!)),
+          // Background GPS accuracy visualization (pulses only when trying to find exact position).
+          AccuracyCircle(
+            radius: _calculateRadius(marker.accuracy ?? 25.0),
+            isPulsing: isUncertain,
+          ),
 
           // Direction cone (always visible, Google Maps style >O).
           DirectionIndicator(
@@ -64,6 +69,6 @@ class UserLocationMarker extends StatelessWidget {
 
     //   LocationMarkerConstants.maxAccuracyRadius,
     // );
-     return 50;
+    return 50;
   }
 }

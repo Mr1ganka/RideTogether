@@ -3,7 +3,6 @@ import 'package:ride_together/features/auth/data/repositories/firebase_auth_repo
 
 import '../../domain/repositories/auth_repository.dart';
 
-final authRepositoryProvider =
-    Provider<AuthRepository>((ref) {
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return FirebaseAuthRepository();
 });

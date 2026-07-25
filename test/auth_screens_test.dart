@@ -9,7 +9,9 @@ import 'package:ride_together/features/location/presentation/providers/initial_p
 import 'helpers/fake_auth_repository.dart';
 
 void main() {
-  testWidgets('login screen requests Google sign-in', (WidgetTester tester) async {
+  testWidgets('login screen requests Google sign-in', (
+    WidgetTester tester,
+  ) async {
     final repository = FakeAuthRepository();
 
     await tester.pumpWidget(
@@ -19,7 +21,10 @@ void main() {
       ),
     );
 
-    expect(find.text('Ride together.\nStay connected.\nRide safer.'), findsOneWidget);
+    expect(
+      find.text('Ride together.\nStay connected.\nRide safer.'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Continue with Google'));
     await tester.pump();

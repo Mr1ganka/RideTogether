@@ -5,47 +5,46 @@ import 'package:ride_together/features/location/presentation/widgets/components/
 import 'package:ride_together/features/location/presentation/widgets/components/location_dot.dart';
 import 'package:ride_together/features/location/presentation/widgets/user_location_marker.dart';
 import 'package:ride_together/features/map/domain/entities/geo_point.dart';
-import 'package:ride_together/features/map/domain/entities/user_location_marker.dart' as map_entity;
+import 'package:ride_together/features/map/domain/entities/user_location_marker.dart'
+    as map_entity;
 
 void main() {
   group('UserLocationMarker components', () {
-    testWidgets('AccuracyCircle renders animated opacity container', (tester) async {
+    testWidgets('AccuracyCircle renders animated opacity container', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AccuracyCircle(radius: 50.0),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AccuracyCircle(radius: 50.0))),
       );
 
       expect(find.byType(AccuracyCircle), findsOneWidget);
     });
 
-    testWidgets('LocationDot renders animated inner and outer dot', (tester) async {
+    testWidgets('LocationDot renders animated inner and outer dot', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: LocationDot(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: LocationDot())),
       );
 
       expect(find.byType(LocationDot), findsOneWidget);
     });
 
-    testWidgets('DirectionIndicator renders when heading is provided', (tester) async {
+    testWidgets('DirectionIndicator renders when heading is provided', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DirectionIndicator(heading: 180.0),
-          ),
+          home: Scaffold(body: DirectionIndicator(heading: 180.0)),
         ),
       );
 
       expect(find.byType(DirectionIndicator), findsOneWidget);
     });
 
-    testWidgets('UserLocationMarker renders location dot and accuracy circle', (tester) async {
+    testWidgets('UserLocationMarker renders location dot and accuracy circle', (
+      tester,
+    ) async {
       final markerEntity = map_entity.UserLocationMarker(
         id: 'u-1',
         position: const GeoPoint(latitude: 10, longitude: 20),
@@ -56,9 +55,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserLocationMarker(marker: markerEntity),
-          ),
+          home: Scaffold(body: UserLocationMarker(marker: markerEntity)),
         ),
       );
 

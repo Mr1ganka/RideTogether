@@ -70,6 +70,5 @@ class UserLocationMarkerNotifier extends Notifier<UserLocationMarker?> {
 
 final userLocationMarkerProvider =
     NotifierProvider<UserLocationMarkerNotifier, UserLocationMarker?>(
-  UserLocationMarkerNotifier.new,
-);
-
+      UserLocationMarkerNotifier.new,
+    );

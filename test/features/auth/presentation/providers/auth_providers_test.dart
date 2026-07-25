@@ -7,18 +7,19 @@ import '../../../../helpers/fake_auth_repository.dart';
 
 void main() {
   group('Auth Providers', () {
-    test('authRepositoryProvider can be overridden for dependency injection', () {
-      final fakeRepo = FakeAuthRepository();
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(fakeRepo),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'authRepositoryProvider can be overridden for dependency injection',
+      () {
+        final fakeRepo = FakeAuthRepository();
+        final container = ProviderContainer(
+          overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
+        );
+        addTearDown(container.dispose);
 
-      final repository = container.read(authRepositoryProvider);
-      expect(repository, equals(fakeRepo));
-    });
+        final repository = container.read(authRepositoryProvider);
+        expect(repository, equals(fakeRepo));
+      },
+    );
 
     test('authStateProvider streams user authentication updates', () async {
       final fakeRepo = FakeAuthRepository(
@@ -26,9 +27,7 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(fakeRepo),
-        ],
+        overrides: [authRepositoryProvider.overrideWithValue(fakeRepo)],
       );
       addTearDown(container.dispose);
 
