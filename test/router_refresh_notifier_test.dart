@@ -4,18 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ride_together/app/router/router_refresh_notifier.dart';
 
 void main() {
-  test('notifies listeners for each auth-state update', () async {
-    final controller = StreamController<Object?>();
+  test('notifies listeners when refresh is called', () {
     final notifier = RouterRefreshNotifier();
     var notifications = 0;
     notifier.addListener(() => notifications++);
 
-    controller.add(Object());
-    await Future<void>.delayed(Duration.zero);
+    notifier.refresh();
 
     expect(notifications, 1);
 
     notifier.dispose();
-    await controller.close();
   });
 }

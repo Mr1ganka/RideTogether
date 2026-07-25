@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ride_together/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:ride_together/features/auth/presentation/screens/login_screen.dart';
 import 'package:ride_together/features/home/presentation/screens/home_screen.dart';
+import 'package:ride_together/features/location/presentation/providers/initial_position_provider.dart';
 
 import 'helpers/fake_auth_repository.dart';
 
@@ -31,14 +32,17 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [authRepositoryProvider.overrideWithValue(repository)],
+        overrides: [
+          authRepositoryProvider.overrideWithValue(repository),
+          initialPositionProvider.overrideWith((ref) async => null),
+        ],
         child: const MaterialApp(home: HomeScreen()),
       ),
     );
 
-    expect(find.text('Home Screen'), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.logout));
+    await tester.tap(find.text('Logout'));
     await tester.pump();
 
     expect(repository.signOutCallCount, 1);

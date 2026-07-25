@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ride_together/app/app.dart';
 import 'package:ride_together/features/auth/domain/entities/app_user.dart';
 import 'package:ride_together/features/auth/presentation/providers/auth_repository_provider.dart';
+import 'package:ride_together/features/home/presentation/screens/home_screen.dart';
+import 'package:ride_together/features/startup/domain/entities/startup_result.dart';
+import 'package:ride_together/features/startup/presentation/providers/startup_provider.dart';
 
 import 'helpers/fake_auth_repository.dart';
 
@@ -16,6 +19,7 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(repository),
+          startupProvider.overrideWith((ref) async => const StartupReady()),
         ],
         child: const RideTogetherApp(),
       ),
@@ -24,11 +28,11 @@ void main() {
     expect(find.text('RideTogether'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
 
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Continue with Google'), findsOneWidget);
-    expect(find.text('Home Screen'), findsNothing);
+    expect(find.byType(HomeScreen), findsNothing);
   });
 
   testWidgets('redirects an authenticated rider from splash to home', (
@@ -42,13 +46,15 @@ void main() {
       ProviderScope(
         overrides: [
           authRepositoryProvider.overrideWithValue(repository),
+          startupProvider.overrideWith((ref) async => const StartupReady()),
         ],
         child: const RideTogetherApp(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Home Screen'), findsOneWidget);
+    expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
   });
 }

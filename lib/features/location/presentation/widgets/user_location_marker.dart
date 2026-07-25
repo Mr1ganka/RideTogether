@@ -36,19 +36,11 @@ class UserLocationMarker extends StatelessWidget {
           if (marker.accuracy != null && marker.accuracy! > 0)
             AccuracyCircle(radius: _calculateRadius(marker.accuracy!)),
 
-          // Direction cone.
-          //
-          // IMPORTANT:
-          // This is intentionally BELOW LocationDot.
-          //
-          // The blue dot hides the cone base,
-          // creating the integrated navigation marker look.
-          if (marker.heading != null)
-            DirectionIndicator(
-              heading: marker.heading!,
-
-              isAnimating: isAnimating,
-            ),
+          // Direction cone (always visible, Google Maps style >O).
+          DirectionIndicator(
+            heading: marker.heading ?? 0.0,
+            isAnimating: isAnimating,
+          ),
 
           // Top layer.
           //

@@ -1,4 +1,6 @@
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:ride_together/core/theme/app_colors.dart';
 
@@ -9,68 +11,64 @@ class DirectionConePainterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: const Size(AppColors.directionConeSize, AppColors.directionConeSize),
-      painter: DirectionConePainter(),
+      painter: const DirectionConePainter(),
     );
   }
 }
 
 class DirectionConePainter extends CustomPainter {
-  static const _alphaStrong = AppColors.directionConeAlphaStrong;
-  static const _alphaMid = AppColors.directionConeAlphaMid;
-  static const _alphaFade = AppColors.directionConeAlphaFade;
-  static const _blur = AppColors.directionConeBlur;
-  static const _color = AppColors.directionConeBeam;
+  final Color color;
+
+  const DirectionConePainter({
+    this.color = AppColors.directionConeBeam,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
+    const radius = 36.0;
 
-    final beamPath = Path();
+    // Google Maps directional beam wedge angle: 54 degrees
+    const sweepAngleDeg = 54.0;
+    const sweepAngleRad = sweepAngleDeg * (math.pi / 180.0);
 
-    beamPath.moveTo(center.dx - size.width * 0.1, center.dy);
+    // North / Up is -90 degrees (-pi/2)
+    const startAngleDeg = -90.0 - (sweepAngleDeg / 2.0);
+    const startAngleRad = startAngleDeg * (math.pi / 180.0);
 
-    beamPath.quadraticBezierTo(
-      center.dx - size.width * 0.25,
-      center.dy - size.height * 0.275,
-      center.dx - size.width * 0.225,
-      center.dy - size.height * 0.6,
-    );
+    final beamPath = Path()
+      ..moveTo(center.dx, center.dy)
+      ..arcTo(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngleRad,
+        sweepAngleRad,
+        false,
+      )
+      ..lineTo(center.dx, center.dy)
+      ..close();
 
-    beamPath.quadraticBezierTo(
-      center.dx,
-      center.dy - size.height * 0.75,
-      center.dx + size.width * 0.225,
-      center.dy - size.height * 0.6,
-    );
-
-    beamPath.quadraticBezierTo(
-      center.dx + size.width * 0.25,
-      center.dy - size.height * 0.275,
-      center.dx + size.width * 0.1,
-      center.dy,
-    );
-
-    beamPath.close();
+    final circleRect = Rect.fromCircle(center: center, radius: radius);
 
     final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        radius: 1.0,
         colors: [
-          _color.withValues(alpha: _alphaStrong),
-          _color.withValues(alpha: _alphaMid),
-          _color.withValues(alpha: _alphaFade),
+          color.withValues(alpha: 0.85),
+          color.withValues(alpha: 0.50),
+          color.withValues(alpha: 0.15),
         ],
         stops: const [0.0, 0.45, 1.0],
-      ).createShader(Offset.zero & size)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, _blur)
+      ).createShader(circleRect)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5)
       ..isAntiAlias = true;
 
     canvas.drawPath(beamPath, paint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+  bool shouldRepaint(covariant DirectionConePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
+

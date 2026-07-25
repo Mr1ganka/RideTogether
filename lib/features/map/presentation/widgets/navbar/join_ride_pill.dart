@@ -31,19 +31,22 @@ class JoinRidePill extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.group_add_outlined, color: theme.colorScheme.onPrimary, size: iconSize),
-            SizedBox(width: screenW * 0.022),
-            Text(
-              'Join Ride',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: theme.colorScheme.onPrimary,
-                fontWeight: FontWeight.w600,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.group_add_outlined, color: theme.colorScheme.onPrimary, size: iconSize),
+              SizedBox(width: screenW * 0.022),
+              Text(
+                'Join Ride',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

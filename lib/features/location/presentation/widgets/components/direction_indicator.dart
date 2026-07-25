@@ -65,25 +65,29 @@ class _DirectionIndicatorState extends State<DirectionIndicator>
       return;
     }
 
+    if (_controller.isAnimating && _rotationAnimation != null) {
+      _currentHeading = _normalize(_rotationAnimation!.value * (180 / math.pi));
+      _controller.stop();
+    }
+
     final difference = _shortestDifference(_currentHeading, target);
 
     final end = _currentHeading + difference;
 
-    _rotationAnimation =
-        Tween<double>(
-          begin: _degreesToRadians(_currentHeading),
-
-          end: _degreesToRadians(end),
-        ).animate(
-          CurvedAnimation(
-            parent: _controller,
-
-            curve: LocationMarkerConstants.headingAnimationCurve,
-          ),
-        );
+    _rotationAnimation = Tween<double>(
+      begin: _degreesToRadians(_currentHeading),
+      end: _degreesToRadians(end),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: LocationMarkerConstants.headingAnimationCurve,
+      ),
+    );
 
     _controller.forward(from: 0).then((_) {
-      _currentHeading = _normalize(end);
+      if (mounted) {
+        _currentHeading = _normalize(end);
+      }
     });
   }
 
@@ -121,11 +125,11 @@ class _DirectionIndicatorState extends State<DirectionIndicator>
       animation: _controller,
 
       builder: (context, child) {
-        final rotation = _rotationAnimation?.value ?? 0;
+        final rotation =
+            _rotationAnimation?.value ?? _degreesToRadians(_currentHeading);
 
         return Transform.rotate(
           angle: rotation,
-
           child: const DirectionConePainterWidget(),
         );
       },

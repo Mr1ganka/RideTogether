@@ -17,7 +17,7 @@ class GeolocatorLocationRepository implements LocationRepository {
   Stream<PositionEntity> getPositionStream() {
     const locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 3,
+      distanceFilter: 0,
     );
 
     return Geolocator.getPositionStream(

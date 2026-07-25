@@ -26,8 +26,8 @@ class FlutterMapEngine implements MapEngine {
   }) {
     final allMarkers = <MapMarker>[...markers];
 
-    // Add user location marker if available
-    if (userLocationMarker != null) {
+    // Add user location marker if available and not already present
+    if (userLocationMarker != null && !allMarkers.any((m) => m.id == userLocationMarker.id)) {
       allMarkers.add(
         MapMarker(
           id: userLocationMarker.id,
