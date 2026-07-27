@@ -28,6 +28,8 @@ class FlutterMapEngine implements MapEngine {
       options: MapOptions(
         initialCenter: initialCamera.target.toFlutterMapLatLng(),
         initialZoom: initialCamera.zoom,
+        minZoom: 2.0,
+        maxZoom: 19.0,
         onPositionChanged: onPositionChanged,
         interactionOptions: const InteractionOptions(
           flags: InteractiveFlag.all,
@@ -40,6 +42,9 @@ class FlutterMapEngine implements MapEngine {
               : MapConstants.osmTileUrl,
           subdomains: MapConstants.subdomains,
           userAgentPackageName: MapConstants.userAgent,
+          tileProvider: NetworkTileProvider(),
+          maxZoom: 19,
+          minZoom: 1,
         ),
 
         // Route Polylines
