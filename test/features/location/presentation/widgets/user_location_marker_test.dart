@@ -20,6 +20,24 @@ void main() {
       expect(find.byType(AccuracyCircle), findsOneWidget);
     });
 
+    testWidgets('AccuracyCircle fades to 0 opacity when not pulsing (confident accuracy)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AccuracyCircle(radius: 50.0, isPulsing: false),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final animatedOpacity = tester.widget<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      );
+      expect(animatedOpacity.opacity, equals(0.0));
+    });
+
     testWidgets('LocationDot renders animated inner and outer dot', (
       tester,
     ) async {

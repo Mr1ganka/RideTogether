@@ -1,7 +1,7 @@
 # RideTogether Map Foundation
 
-**Version:** 5.1  
-**Last Updated:** 2026-07-23
+**Version:** 5.2  
+**Last Updated:** 2026-07-27
 
 ---
 
@@ -38,7 +38,7 @@ The **Map Foundation** provides the core infrastructure for all map functionalit
 ### Current Implementation
 
 ```
-flutter_map + OpenStreetMap
+flutter_map + OpenStreetMap / CartoDB Voyager & Dark Matter
 ```
 
 ### Future Provider Support
@@ -93,6 +93,9 @@ MapEngine
         │
         ▼
 FlutterMapEngine
+        │
+        ▼
+SmoothMarkerLayer (60 FPS LatLng Interpolation)
         │
         ▼
 flutter_map
@@ -164,13 +167,17 @@ features/
 │       ├── providers/
 │       │   ├── map_controller_provider.dart
 │       │   └── map_mode_provider.dart
+│       ├── utils/
+│       │   └── map_animation_utils.dart        (animatedMapMove helper)
 │       └── widgets/
 │           ├── app_map.dart
+│           ├── smooth_marker_layer.dart        (60 FPS position lerping)
 │           ├── floating_map_controls.dart      (export hub)
 │           └── navbar/
 │               ├── floating_map_controls.dart  (main widget)
 │               ├── bottom_nav_bar.dart
 │               ├── recenter_button.dart
+│               ├── zoom_controls.dart          (+ / - animated zoom)
 │               ├── nav_icon_button.dart
 │               ├── join_ride_pill.dart
 │               └── nav_handle.dart
@@ -197,6 +204,9 @@ MapEngine
 FlutterMapEngine
     │
     ▼
+SmoothMarkerLayer
+    │
+    ▼
 flutter_map
 ```
 
@@ -204,29 +214,19 @@ flutter_map
 
 ```
 GPS
-
     │
-
 GeolocatorLocationRepository
-
     │
-
 PositionEntity
-
     │
-
 currentPositionProvider
-
     │
-
 userLocationMarkerProvider
-
     │
-
 UserLocationMarker
-
     │
-
+SmoothMarkerLayer
+    │
 FlutterMap MarkerLayer
 ```
 
@@ -243,8 +243,8 @@ UserLocationMarker
 
     │
 
-    ├── AccuracyCircle
-    ├── DirectionIndicator
+    ├── AccuracyCircle (Auto-fading pulse when confident)
+    ├── DirectionIndicator (Shortest-path rotation lerp)
     └── LocationDot
 ```
 
@@ -267,15 +267,11 @@ UserLocationMarker
 | Capability | Description |
 |------------|-------------|
 | Live GPS position updates | Real-time position stream |
-| Animated user location marker | Smooth position transitions |
-| Animated accuracy circle | Pulsing accuracy visualization |
-| Heading rotation | Shortest-path interpolation |
+| Animated user location marker | 60 FPS smooth LatLng position interpolation via `SmoothMarkerLayer` |
+| Conditional accuracy circle | Pulsing accuracy halo when uncertain; auto-fades to `0.0` opacity when accuracy is confident ($\le 20\text{m}$) |
+| Heading rotation | Shortest-path angle interpolation |
 | Independent marker layers | Separate layer management |
-| Approximate accuracy radius | Visual accuracy scaling | |
-
-### Known Limitation
-
-> **TODO:** Proper accuracy scaling should use the current map projection and zoom level provided by `flutter_map`.
+| Accuracy radius scaling | Clamped visual accuracy radius scaling |
 
 ---
 
@@ -286,13 +282,15 @@ UserLocationMarker
 | Category | Features |
 |----------|----------|
 | **Architecture** | Provider-agnostic MapEngine abstraction, FlutterMapEngine implementation |
-| **Rendering** | OpenStreetMap tile rendering, AppMap widget (accepts `MapController`) |
+| **Rendering** | OpenStreetMap / CartoDB tile rendering, AppMap widget (accepts `MapController`) |
 | **Domain Models** | GeoPoint, CameraPosition, MapMarker, MapPolyline, MapBounds, MapMode |
 | **Location** | PositionEntity integration, Current position stream |
-| **User Marker** | Live user location updates, Custom user location marker |
-| **Animations** | Heading animation (shortest-path), Accuracy pulse animation |
-| **Foundations** | Marker system, Polyline system |
-| **Controls** | FloatingMapControls (auto-hide navbar), RecenterButton, MapController provider |
+| **User Marker** | Live user location updates, Custom user location marker with auto-fading accuracy halo |
+| **Smooth Movement** | `SmoothMarkerLayer` smooth LatLng interpolation over 800ms (`Curves.easeOutCubic`) |
+| **Camera Movement** | `animatedMapMove` helper for smooth camera panning & step zooming |
+| **Animations** | Heading animation (shortest-path), Accuracy pulse animation & fade out |
+| **Foundations** | Marker system, Dual-pass polyline casing & glow system |
+| **Controls** | FloatingMapControls (auto-hide navbar), RecenterButton (animated), ZoomControls (+ / -), MapController provider |
 | **Startup Gate** | `StartupResult` + `LocationRequiredScreen` gates map access behind location permission |
 
 ---
@@ -572,10 +570,13 @@ class FlutterMapEngine implements MapEngine {
 | File | Purpose |
 |------|---------|
 | `widgets/app_map.dart` | Main map widget, composes engine, receives `MapController` |
+| `widgets/smooth_marker_layer.dart` | 60 FPS animated LatLng marker position interpolation |
+| `utils/map_animation_utils.dart` | `animatedMapMove` helper for smooth camera panning and zooming |
 | `widgets/floating_map_controls.dart` | Export hub for all navbar widgets |
 | `widgets/navbar/floating_map_controls.dart` | Main FloatingMapControls widget with auto-hide and animation |
 | `widgets/navbar/bottom_nav_bar.dart` | Bottom nav bar with icon tiles and JoinRide pill |
 | `widgets/navbar/recenter_button.dart` | Circular Recenter button with `my_location` icon |
+| `widgets/navbar/zoom_controls.dart` | Floating Zoom In (+) and Zoom Out (-) buttons |
 | `widgets/navbar/nav_icon_button.dart` | Icon + label tile for nav bar actions |
 | `widgets/navbar/join_ride_pill.dart` | Primary-colored JoinRide call-to-action pill |
 | `widgets/navbar/nav_handle.dart` | Toggle handle for show/hide on the nav bar |

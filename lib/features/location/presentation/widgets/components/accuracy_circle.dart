@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/location_marker_constants.dart';
 
 class AccuracyCircle extends StatefulWidget {
   final double radius;
@@ -62,24 +63,29 @@ class _AccuracyCircleState extends State<AccuracyCircle>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final scale = widget.isPulsing ? _scaleAnimation.value : 1.0;
-        final opacity = widget.isPulsing ? _opacityAnimation.value : 0.15;
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 400),
+      opacity: widget.isPulsing ? 1.0 : 0.0,
+      curve: Curves.easeOut,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final scale = widget.isPulsing ? _scaleAnimation.value : 1.0;
+          final opacity = _opacityAnimation.value;
 
-        return Transform.scale(
-          scale: scale,
-          child: Container(
-            width: widget.radius * 2,
-            height: widget.radius * 2,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue.withValues(alpha: opacity),
+          return Transform.scale(
+            scale: scale,
+            child: Container(
+              width: widget.radius * 2,
+              height: widget.radius * 2,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: LocationMarkerConstants.accuracyColor.withValues(alpha: opacity),
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

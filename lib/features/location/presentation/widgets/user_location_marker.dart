@@ -58,17 +58,10 @@ class UserLocationMarker extends StatelessWidget {
   }
 
   double _calculateRadius(double accuracy) {
-    // TODO:
-    // Proper accuracy scaling should later use
-    // flutter_map projection and current zoom level.
-
-    // final radius = accuracy * LocationMarkerConstants.pixelsPerMeter;
-
-    // return radius.clamp(
-    //   LocationMarkerConstants.minAccuracyRadius,
-
-    //   LocationMarkerConstants.maxAccuracyRadius,
-    // );
-    return 50;
+    final radius = accuracy * LocationMarkerConstants.pixelsPerMeter;
+    return radius.clamp(
+      LocationMarkerConstants.minAccuracyRadius,
+      LocationMarkerConstants.maxAccuracyRadius,
+    );
   }
 }

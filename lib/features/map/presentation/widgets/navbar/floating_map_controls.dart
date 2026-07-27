@@ -10,10 +10,12 @@ import 'package:ride_together/core/theme/app_spacing.dart';
 
 import '../../../domain/entities/map_mode.dart';
 import '../../providers/map_mode_provider.dart';
+import '../../utils/map_animation_utils.dart';
 import '../../../../auth/presentation/providers/auth_repository_provider.dart';
 import '../../../../location/presentation/providers/current_posisiton_provider.dart';
 
 import 'recenter_button.dart';
+import 'zoom_controls.dart';
 import 'bottom_nav_bar.dart';
 import 'nav_handle.dart';
 
@@ -28,7 +30,7 @@ class FloatingMapControls extends ConsumerStatefulWidget {
 }
 
 class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _slideController;
   late final Animation<Offset> _slideAnimation;
 
@@ -107,12 +109,39 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
     final position = ref.read(currentPositionProvider).value;
 
     if (position != null) {
-      widget.mapController.move(
-        LatLng(position.latitude, position.longitude),
-        widget.mapController.camera.zoom,
+      animatedMapMove(
+        mapController: widget.mapController,
+        vsync: this,
+        destLocation: LatLng(position.latitude, position.longitude),
+        destZoom: widget.mapController.camera.zoom.clamp(14.0, 18.0),
+        duration: const Duration(milliseconds: 650),
       );
     }
 
+    _resetAutoHideTimer();
+  }
+
+  void _onZoomIn() {
+    final camera = widget.mapController.camera;
+    animatedMapMove(
+      mapController: widget.mapController,
+      vsync: this,
+      destLocation: camera.center,
+      destZoom: (camera.zoom + 1.0).clamp(1.0, 20.0),
+      duration: const Duration(milliseconds: 300),
+    );
+    _resetAutoHideTimer();
+  }
+
+  void _onZoomOut() {
+    final camera = widget.mapController.camera;
+    animatedMapMove(
+      mapController: widget.mapController,
+      vsync: this,
+      destLocation: camera.center,
+      destZoom: (camera.zoom - 1.0).clamp(1.0, 20.0),
+      duration: const Duration(milliseconds: 300),
+    );
     _resetAutoHideTimer();
   }
 
@@ -148,7 +177,18 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
         Positioned(
           right: AppSpacing.mapPadding,
           bottom: AppSpacing.bottomNavAir + navBarHeight + handleHeight + 12,
-          child: RecenterButton(onTap: _onRecenter),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ZoomControls(
+                onZoomIn: _onZoomIn,
+                onZoomOut: _onZoomOut,
+              ),
+              const SizedBox(height: 12),
+              RecenterButton(onTap: _onRecenter),
+            ],
+          ),
         ),
 
         // Navbar

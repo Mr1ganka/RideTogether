@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:ride_together/features/location/presentation/widgets/constants/location_marker_constants.dart';
+import 'package:ride_together/features/map/presentation/widgets/smooth_marker_layer.dart';
 
 import '../../domain/engine/map_engine.dart';
 import '../../domain/entities/camera_position.dart';
@@ -11,8 +11,6 @@ import '../../domain/entities/user_location_marker.dart' as map_entity;
 
 import '../mappers/flutter_map_mapper.dart';
 import '../constants/map_constants.dart';
-import 'package:ride_together/features/location/presentation/widgets/user_location_marker.dart'
-    as location_widget;
 
 class FlutterMapEngine implements MapEngine {
   @override
@@ -24,71 +22,56 @@ class FlutterMapEngine implements MapEngine {
     map_entity.UserLocationMarker? userLocationMarker,
     MapController? mapController,
   }) {
-    final allMarkers = <MapMarker>[...markers];
-
-    // Add user location marker if available and not already present
-    if (userLocationMarker != null &&
-        !allMarkers.any((m) => m.id == userLocationMarker.id)) {
-      allMarkers.add(
-        MapMarker(
-          id: userLocationMarker.id,
-          position: userLocationMarker.position,
-        ),
-      );
-    }
-
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
         initialCenter: initialCamera.target.toFlutterMapLatLng(),
-
         initialZoom: initialCamera.zoom,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.all,
+        ),
       ),
-
       children: [
         TileLayer(
           urlTemplate: theme == MapTheme.dark
               ? MapConstants.darkTileUrl
               : MapConstants.osmTileUrl,
-
-          subdomains: theme == MapTheme.dark
-              ? MapConstants.darkSubdomains
-              : const [],
-
+          subdomains: MapConstants.subdomains,
           userAgentPackageName: MapConstants.userAgent,
         ),
 
-        MarkerLayer(
-          markers: allMarkers.map((marker) {
-            // Use custom user location marker for the current user
-            if (marker.id == 'current_user' && userLocationMarker != null) {
-              return Marker(
-                point: marker.position.toFlutterMapLatLng(),
-                width: LocationMarkerConstants.markerSize,
-                height: LocationMarkerConstants.markerSize,
-                alignment: Alignment.center,
-                child: location_widget.UserLocationMarker(
-                  marker: userLocationMarker,
-                  isAnimating: true,
-                ),
+        // Route Polylines
+        if (polylines.isNotEmpty) ...[
+          // Background casing for polylines (drop-shadow depth)
+          PolylineLayer(
+            polylines: polylines.map((poly) {
+              return Polyline(
+                points: poly.points.map((p) => p.toFlutterMapLatLng()).toList(),
+                strokeWidth: 8.0,
+                color: Colors.black.withValues(alpha: 0.2),
+                strokeCap: StrokeCap.round,
+                strokeJoin: StrokeJoin.round,
               );
-            }
+            }).toList(),
+          ),
+          // Main polyline layer
+          PolylineLayer(
+            polylines: polylines.map((poly) {
+              return Polyline(
+                points: poly.points.map((p) => p.toFlutterMapLatLng()).toList(),
+                strokeWidth: 5.0,
+                color: const Color(0xFF1A73E8),
+                strokeCap: StrokeCap.round,
+                strokeJoin: StrokeJoin.round,
+              );
+            }).toList(),
+          ),
+        ],
 
-            // Default marker for other markers
-            return Marker(
-              point: marker.position.toFlutterMapLatLng(),
-
-              width: 50,
-
-              height: 50,
-
-              child: const Icon(
-                Icons.location_pin,
-                color: Colors.blue,
-                size: 40,
-              ),
-            );
-          }).toList(),
+        // Smooth animated marker layer
+        SmoothMarkerLayer(
+          markers: markers,
+          userLocationMarker: userLocationMarker,
         ),
       ],
     );

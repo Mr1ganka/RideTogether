@@ -6,5 +6,7 @@ class MapConstants {
 
   static const darkSubdomains = ['a', 'b', 'c', 'd'];
 
+  static const subdomains = ['a', 'b', 'c', 'd'];
+
   static const userAgent = 'com.ridetogether.app';
 }
