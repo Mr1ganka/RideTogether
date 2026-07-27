@@ -15,5 +15,6 @@ abstract interface class MapEngine {
     required MapTheme theme,
     UserLocationMarker? userLocationMarker,
     MapController? mapController,
+    void Function(MapCamera camera, bool hasGesture)? onPositionChanged,
   });
 }

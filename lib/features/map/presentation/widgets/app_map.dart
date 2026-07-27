@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:ride_together/features/map/domain/entities/map_theme.dart';
 
 import '../../domain/entities/camera_position.dart';
@@ -9,51 +11,98 @@ import '../../domain/entities/map_marker.dart';
 import '../../domain/entities/map_polyline.dart';
 import '../providers/map_engine_provider.dart';
 import '../providers/user_marker_provider.dart';
+import '../utils/map_animation_utils.dart';
 
-class AppMap extends ConsumerWidget {
+class AppMap extends ConsumerStatefulWidget {
   const AppMap({
     super.key,
     this.initialCamera,
     this.markers = const [],
     this.polylines = const [],
     required this.mapController,
+    this.autoPanOnEdge = true,
   });
 
   final CameraPosition? initialCamera;
-
   final List<MapMarker> markers;
-
   final List<MapPolyline> polylines;
-
   final MapController mapController;
+  final bool autoPanOnEdge;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final mapEngine = ref.watch(mapEngineProvider);
+  ConsumerState<AppMap> createState() => _AppMapState();
+}
 
+class _AppMapState extends ConsumerState<AppMap> with TickerProviderStateMixin {
+  bool _isUserGesturing = false;
+  Timer? _gestureResetTimer;
+
+  void _onPositionChanged(MapCamera camera, bool hasGesture) {
+    if (hasGesture) {
+      _isUserGesturing = true;
+      _gestureResetTimer?.cancel();
+      _gestureResetTimer = Timer(const Duration(seconds: 6), () {
+        if (mounted) {
+          setState(() {
+            _isUserGesturing = false;
+          });
+        }
+      });
+    }
+  }
+
+  void _checkAndPanCamera(LatLng markerPos) {
+    if (!widget.autoPanOnEdge || _isUserGesturing) return;
+
+    final camera = widget.mapController.camera;
+    if (isLatLngNearCameraEdge(camera: camera, point: markerPos)) {
+      animatedMapMove(
+        mapController: widget.mapController,
+        vsync: this,
+        destLocation: markerPos,
+        destZoom: camera.zoom,
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _gestureResetTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mapEngine = ref.watch(mapEngineProvider);
     final userLocationMarker = ref.watch(userLocationMarkerProvider);
 
-    final brightness = Theme.of(context).brightness;
+    // Listen for marker updates to perform automatic camera edge-recenter
+    ref.listen(userLocationMarkerProvider, (previous, next) {
+      if (next != null) {
+        final pos = LatLng(next.position.latitude, next.position.longitude);
+        _checkAndPanCamera(pos);
+      }
+    });
 
+    final brightness = Theme.of(context).brightness;
     final mapTheme = brightness == Brightness.dark
         ? MapTheme.dark
         : MapTheme.light;
 
     return mapEngine.buildMap(
-      initialCamera:
-          initialCamera ??
+      initialCamera: widget.initialCamera ??
           const CameraPosition(
             target: GeoPoint(latitude: 0, longitude: 0),
             zoom: 2,
           ),
-
-      markers: markers,
-
-      polylines: polylines,
-
+      markers: widget.markers,
+      polylines: widget.polylines,
       theme: mapTheme,
       userLocationMarker: userLocationMarker,
-      mapController: mapController,
+      mapController: widget.mapController,
+      onPositionChanged: _onPositionChanged,
     );
   }
 }

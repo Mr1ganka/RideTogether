@@ -21,12 +21,14 @@ class FlutterMapEngine implements MapEngine {
     required MapTheme theme,
     map_entity.UserLocationMarker? userLocationMarker,
     MapController? mapController,
+    void Function(MapCamera camera, bool hasGesture)? onPositionChanged,
   }) {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
         initialCenter: initialCamera.target.toFlutterMapLatLng(),
         initialZoom: initialCamera.zoom,
+        onPositionChanged: onPositionChanged,
         interactionOptions: const InteractionOptions(
           flags: InteractiveFlag.all,
         ),

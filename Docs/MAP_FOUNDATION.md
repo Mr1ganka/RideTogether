@@ -1,6 +1,6 @@
 # RideTogether Map Foundation
 
-**Version:** 5.2  
+**Version:** 5.3  
 **Last Updated:** 2026-07-27
 
 ---
@@ -86,7 +86,7 @@ currentPositionProvider
 UserLocationMarker
         │
         ▼
-AppMap
+AppMap (Camera Edge Detector & Auto-Pan)
         │
         ▼
 MapEngine
@@ -134,6 +134,7 @@ abstract interface class MapEngine {
     MapController? mapController,
     UserLocationMarker? userLocationMarker,
     required MapTheme theme,
+    void Function(MapCamera camera, bool hasGesture)? onPositionChanged,
   });
 }
 ```
@@ -168,9 +169,9 @@ features/
 │       │   ├── map_controller_provider.dart
 │       │   └── map_mode_provider.dart
 │       ├── utils/
-│       │   └── map_animation_utils.dart        (animatedMapMove helper)
+│       │   └── map_animation_utils.dart        (animatedMapMove, isLatLngNearCameraEdge, animatedFitBounds)
 │       └── widgets/
-│           ├── app_map.dart
+│           ├── app_map.dart                    (camera edge auto-pan & gesture control)
 │           ├── smooth_marker_layer.dart        (60 FPS position lerping)
 │           ├── floating_map_controls.dart      (export hub)
 │           └── navbar/
@@ -224,6 +225,8 @@ currentPositionProvider
 userLocationMarkerProvider
     │
 UserLocationMarker
+    │
+AppMap Edge Detection ──▶ animatedMapMove (Camera update)
     │
 SmoothMarkerLayer
     │
@@ -287,7 +290,8 @@ UserLocationMarker
 | **Location** | PositionEntity integration, Current position stream |
 | **User Marker** | Live user location updates, Custom user location marker with auto-fading accuracy halo |
 | **Smooth Movement** | `SmoothMarkerLayer` smooth LatLng interpolation over 800ms (`Curves.easeOutCubic`) |
-| **Camera Movement** | `animatedMapMove` helper for smooth camera panning & step zooming |
+| **Camera Control** | Edge detection via `isLatLngNearCameraEdge()` & zoom-adaptive smooth camera re-centering (`animatedMapMove`) |
+| **Fit Bounds** | `animatedFitBounds()` helper for smooth multi-marker viewport bounding |
 | **Animations** | Heading animation (shortest-path), Accuracy pulse animation & fade out |
 | **Foundations** | Marker system, Dual-pass polyline casing & glow system |
 | **Controls** | FloatingMapControls (auto-hide navbar), RecenterButton (animated), ZoomControls (+ / -), MapController provider |
