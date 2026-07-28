@@ -39,7 +39,7 @@ class JoinRidePill extends StatelessWidget {
               Icon(Icons.group_add_outlined, color: theme.colorScheme.onPrimary, size: iconSize),
               SizedBox(width: screenW * 0.022),
               Text(
-                'Join Ride',
+                'Ride',
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,

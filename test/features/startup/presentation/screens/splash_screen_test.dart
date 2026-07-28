@@ -4,11 +4,7 @@ import 'package:ride_together/features/startup/presentation/screens/splash_scree
 
 void main() {
   testWidgets('SplashScreen renders app title', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: SplashScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
 
     expect(find.text('RideTogether'), findsOneWidget);
   });

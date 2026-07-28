@@ -26,8 +26,8 @@ void main() {
       expect(map['id'], 'r1');
       expect(map['displayName'], 'Sam');
       expect(map['photoUrl'], 'pic.png');
-      expect(map['createdAt'], now);
-      expect(map['updatedAt'], now);
+      expect(map['createdAt'], now.toIso8601String());
+      expect(map['updatedAt'], now.toIso8601String());
     });
 
     test('creates model from map with toDate method', () {

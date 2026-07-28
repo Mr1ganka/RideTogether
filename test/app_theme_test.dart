@@ -27,8 +27,14 @@ void main() {
       expect(theme.cardTheme.color, AppColors.surface);
       expect(theme.dialogTheme.backgroundColor, AppColors.surface);
       expect(theme.bottomSheetTheme.backgroundColor, AppColors.surface);
-      expect(theme.floatingActionButtonTheme.backgroundColor, AppColors.primary);
-      expect(theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}), AppColors.primary);
+      expect(
+        theme.floatingActionButtonTheme.backgroundColor,
+        AppColors.primary,
+      );
+      expect(
+        theme.elevatedButtonTheme.style?.backgroundColor?.resolve({}),
+        AppColors.primary,
+      );
       expect(theme.appBarTheme.backgroundColor, AppColors.surface);
     });
   });

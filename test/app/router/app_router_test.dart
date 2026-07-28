@@ -89,7 +89,7 @@ void main() {
 
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
-      expect(find.text('Join Ride'), findsOneWidget);
+      expect(find.text('Ride'), findsOneWidget);
     });
   });
 }

@@ -1,4 +1,4 @@
-﻿# RideTogether Roadmap
+# RideTogether Roadmap
 
 **Version:** 4.1  
 **Last Updated:** 2026-07-23
@@ -347,6 +347,14 @@ Allow riders to create and join group rides.
 | Ride lifecycle | Planned → Recruiting → Active → Paused → Completed |
 | Permissions | Role-based access |
 | Ride state | Real-time ride status |
+
+### MVP Data Decisions & Roadmap TODOs
+
+- **`members` List**: Plural field name in domain model and database map.
+- **Embedded Members List**: Members array embedded in `rides/{rideId}` document for single-read queries in MVP. *(TODO: Migrate to `rides/{rideId}/members` subcollection in post-MVP)*.
+- **Embedded Profile Snapshot**: Full `RiderProfile` inside each `RideMember`. *(TODO: Decouple to `riderId` reference post-MVP)*.
+- **ISO-8601 Serialization**: Standard ISO-8601 strings for `DateTime` fields.
+
 
 ### Example Flow
 
