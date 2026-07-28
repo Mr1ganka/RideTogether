@@ -41,11 +41,20 @@ class _AppMapState extends ConsumerState<AppMap> with TickerProviderStateMixin {
     if (hasGesture) {
       _isUserGesturing = true;
       _gestureResetTimer?.cancel();
-      _gestureResetTimer = Timer(const Duration(seconds: 6), () {
+      _gestureResetTimer = Timer(const Duration(seconds: 3), () {
         if (mounted) {
           setState(() {
             _isUserGesturing = false;
           });
+          // Immediately check if marker is near edge when 3s gesture cooldown expires
+          final userMarker = ref.read(userLocationMarkerProvider);
+          if (userMarker != null) {
+            final pos = LatLng(
+              userMarker.position.latitude,
+              userMarker.position.longitude,
+            );
+            _checkAndPanCamera(pos);
+          }
         }
       });
     }

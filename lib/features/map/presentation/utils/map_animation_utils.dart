@@ -42,7 +42,7 @@ void animatedMapMove({
 bool isLatLngNearCameraEdge({
   required MapCamera camera,
   required LatLng point,
-  double marginRatio = 0.20,
+  double marginRatio = 0.05,
 }) {
   final bounds = camera.visibleBounds;
   final south = bounds.south;
@@ -55,7 +55,7 @@ bool isLatLngNearCameraEdge({
 
   // Zoom-adaptive margin calculation:
   // Higher zoom levels have tighter geographical spans, so we use slightly higher margin
-  final effectiveMargin = (camera.zoom >= 15.0 ? marginRatio * 1.15 : marginRatio).clamp(0.15, 0.30);
+  final effectiveMargin = (camera.zoom >= 15.0 ? marginRatio * 1.15 : marginRatio).clamp(0.02, 0.20);
 
   final safeSouth = south + latSpan * effectiveMargin;
   final safeNorth = north - latSpan * effectiveMargin;

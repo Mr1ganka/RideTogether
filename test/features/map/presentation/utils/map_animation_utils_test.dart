@@ -43,5 +43,26 @@ void main() {
 
       expect(isNearEdge, isTrue);
     });
+
+    test('isLatLngNearCameraEdge uses default 5% margin ratio correctly', () {
+      final camera = MapCamera(
+        center: const LatLng(10.0, 20.0),
+        zoom: 15.0,
+        crs: const Epsg3857(),
+        rotation: 0.0,
+        nonRotatedSize: const Size(800.0, 600.0),
+      );
+
+      final bounds = camera.visibleBounds;
+      final latSpan = bounds.north - bounds.south;
+
+      // Inside safe bounds (farther than 5% from edge)
+      final safePoint = LatLng(camera.center.latitude + latSpan * 0.20, camera.center.longitude);
+      expect(isLatLngNearCameraEdge(camera: camera, point: safePoint), isFalse);
+
+      // Outside safe bounds (closer than 5% to edge)
+      final nearEdgePoint = LatLng(bounds.north - latSpan * 0.01, camera.center.longitude);
+      expect(isLatLngNearCameraEdge(camera: camera, point: nearEdgePoint), isTrue);
+    });
   });
 }
