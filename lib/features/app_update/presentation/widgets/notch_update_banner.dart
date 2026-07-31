@@ -103,24 +103,27 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
     final topPadding = MediaQuery.of(context).padding.top;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    final double calculatedTop = topPadding > 0 ? topPadding + 4 : 10;
+    final cleanReleaseNotes = widget.versionInfo.releaseNotes.replaceAll('"', '').trim();
+
     return Positioned(
-      top: topPadding > 0 ? topPadding + 6 : 12,
-      left: _isMinimized ? screenWidth * 0.14 : 14,
-      right: _isMinimized ? screenWidth * 0.14 : 14,
+      top: calculatedTop,
+      left: _isMinimized ? screenWidth * 0.26 : 14,
+      right: _isMinimized ? screenWidth * 0.26 : 14,
       child: Material(
         color: Colors.transparent,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOutCubic,
           padding: EdgeInsets.symmetric(
-            horizontal: _isMinimized ? 14 : 16,
-            vertical: _isMinimized ? 8 : 12,
+            horizontal: _isMinimized ? 10 : 16,
+            vertical: _isMinimized ? 6 : 12,
           ),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: 0.96),
+            color: theme.colorScheme.surface.withValues(alpha: 0.98),
             borderRadius: BorderRadius.circular(_isMinimized ? 24 : 18),
             border: Border.all(
-              color: theme.colorScheme.primary.withValues(alpha: 0.6),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
               width: 1.5,
             ),
             boxShadow: [
@@ -131,19 +134,19 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
                 offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 20,
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: _isMinimized ? _buildMinimizedPill(theme) : _buildExpandedBanner(theme, screenWidth),
+          child: _isMinimized ? _buildMinimizedPill(theme) : _buildExpandedBanner(theme, screenWidth, cleanReleaseNotes),
         ),
       ),
     );
   }
 
-  /// Minimized hardware notch pill (theme adaptive)
+  /// Minimized state: Sleek, fully-rounded centered hardware notch pill
   Widget _buildMinimizedPill(ThemeData theme) {
     return InkWell(
       borderRadius: BorderRadius.circular(24),
@@ -169,7 +172,7 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
           if (_isDownloading) ...[
             const SizedBox(width: 10),
             SizedBox(
-              width: 60,
+              width: 50,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
@@ -186,8 +189,8 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
     );
   }
 
-  /// Expanded banner (theme adaptive)
-  Widget _buildExpandedBanner(ThemeData theme, double screenWidth) {
+  /// Expanded state: Clean floating top banner
+  Widget _buildExpandedBanner(ThemeData theme, double screenWidth, String releaseNotes) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +198,7 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Left Side: Later Button
+            // Left Side: Later Button (Minimizes banner into top notch pill)
             OutlinedButton(
               style: OutlinedButton.styleFrom(
                 minimumSize: Size.zero,
@@ -214,7 +217,7 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
               ),
             ),
 
-            // Center: Version Badge
+            // Center: Version Badge (taps open full dialog)
             GestureDetector(
               onTap: _openFullDialog,
               child: Container(
@@ -261,18 +264,19 @@ class _NotchUpdateBannerState extends State<NotchUpdateBanner> with WidgetsBindi
           ],
         ),
 
-        const SizedBox(height: 8),
-
-        // Description / Release notes preview
-        GestureDetector(
-          onTap: _openFullDialog,
-          child: Text(
-            widget.versionInfo.releaseNotes,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
+        if (releaseNotes.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          // Description / Release notes preview (taps open full dialog)
+          GestureDetector(
+            onTap: _openFullDialog,
+            child: Text(
+              releaseNotes,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
+            ),
           ),
-        ),
+        ],
 
         // Real-Time Progress Bar inside Expanded Banner
         if (_isDownloading) ...[

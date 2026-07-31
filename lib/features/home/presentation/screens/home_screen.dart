@@ -64,7 +64,7 @@ class HomeMapView extends ConsumerWidget {
     final groupMarkers = ref.watch(groupRiderMarkersProvider);
 
     final allMarkers = [
-      if (userMarker != null) userMarker,
+      ?userMarker,
       ...groupMarkers,
     ];
 
