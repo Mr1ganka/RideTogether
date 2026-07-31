@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "228297336557-ngr3k1cpvd5gjjls2chs9hqfij3pui8n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ridetogether.app",
+            "certificate_hash": "e534d312fe571a5e85f676bbf38a1bfd77a5766b"
+          }
+        },
+        {
           "client_id": "228297336557-ptsu4te6db13dvqbchigh2ob7gptujdi.apps.googleusercontent.com",
           "client_type": 3
         }

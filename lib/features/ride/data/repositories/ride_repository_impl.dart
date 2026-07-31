@@ -5,8 +5,10 @@ import 'package:ride_together/features/profile/domain/repositories/profile_repos
 import 'package:ride_together/features/ride/data/datasources/ride_remote_data_source.dart';
 import 'package:ride_together/features/ride/data/models/ride_member_model.dart';
 import 'package:ride_together/features/ride/data/models/ride_model.dart';
+import 'package:ride_together/features/ride/data/models/rider_location_model.dart';
 import 'package:ride_together/features/ride/domain/entities/ride.dart';
 import 'package:ride_together/features/ride/domain/entities/ride_status.dart';
+import 'package:ride_together/features/ride/domain/entities/rider_location.dart';
 import 'package:ride_together/features/ride/domain/entities/rider_role.dart';
 import 'package:ride_together/features/ride/domain/repositories/ride_repository.dart';
 
@@ -154,6 +156,20 @@ class RideRepositoryImpl implements RideRepository {
     );
 
     await remoteDataSource.updateRideMembers(rideId, updatedRide);
+  }
+
+  @override
+  Future<void> updateRiderLocation({
+    required String rideId,
+    required RiderLocation location,
+  }) async {
+    final model = RiderLocationModel.fromEntity(location);
+    await remoteDataSource.updateRiderLocation(rideId, model);
+  }
+
+  @override
+  Stream<List<RiderLocation>> watchRideLocations(String rideId) {
+    return remoteDataSource.watchRideLocations(rideId);
   }
 
   /// Generates a random 6-character alphanumeric uppercase join code (e.g. "RIDE68").

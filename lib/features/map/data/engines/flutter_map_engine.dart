@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:ride_together/core/theme/app_colors.dart';
+import 'package:ride_together/core/theme/app_radius.dart';
 import 'package:ride_together/features/location/presentation/widgets/constants/location_marker_constants.dart';
 
 import '../../domain/engine/map_engine.dart';
@@ -74,18 +76,61 @@ class FlutterMapEngine implements MapEngine {
               );
             }
 
-            // Default marker for other markers
+            final markerColor =
+                marker.isLeader ? AppColors.leaderMarker : AppColors.participantMarker;
+
+            // Labeled marker for group ride participants
             return Marker(
               point: marker.position.toFlutterMapLatLng(),
-
-              width: 50,
-
-              height: 50,
-
-              child: const Icon(
-                Icons.location_pin,
-                color: Colors.blue,
-                size: 40,
+              width: 70,
+              height: 70,
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (marker.label != null)
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: markerColor,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (marker.isLeader) ...[
+                            const Icon(
+                              Icons.star,
+                              size: 10,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 2),
+                          ],
+                          Text(
+                            marker.label!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  Icon(
+                    Icons.navigation,
+                    color: markerColor,
+                    size: 28,
+                  ),
+                ],
               ),
             );
           }).toList(),

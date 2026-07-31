@@ -5,11 +5,14 @@ import 'package:ride_together/features/map/presentation/providers/user_marker_pr
 
 import '../../../../features/location/presentation/providers/initial_position_provider.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/map/domain/entities/camera_position.dart';
 import '../../../../features/map/domain/entities/geo_point.dart';
 import '../../../../features/map/presentation/providers/map_controller_provider.dart';
 import '../../../../features/map/presentation/widgets/app_map.dart';
 import '../../../../features/map/presentation/widgets/floating_map_controls.dart';
+import '../../../../features/ride/presentation/providers/ride_location_providers.dart';
+import '../../../../features/ride/presentation/widgets/active_ride_panel.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -21,37 +24,59 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    // Automatically triggers live location publishing when user is in an active ride
+    ref.watch(rideLocationPublisherProvider);
+
     final mapController = ref.watch(mapControllerProvider);
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       body: Stack(
         children: [
-          _buildMap(mapController),
+          HomeMapView(mapController: mapController),
+          Positioned(
+            top: topPadding + AppSpacing.sm,
+            left: 0,
+            right: 0,
+            child: const ActiveRidePanel(),
+          ),
           FloatingMapControls(mapController: mapController),
         ],
       ),
     );
   }
+}
 
-  Widget _buildMap(MapController mapController) {
+class HomeMapView extends ConsumerWidget {
+  const HomeMapView({required this.mapController, super.key});
+
+  final MapController mapController;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final position = ref.watch(initialPositionProvider);
+    final userMarker = ref.watch(userMarkerProvider);
+    final groupMarkers = ref.watch(groupRiderMarkersProvider);
 
-    final marker = ref.watch(userMarkerProvider);
+    final allMarkers = [
+      if (userMarker != null) userMarker,
+      ...groupMarkers,
+    ];
 
     return position.when(
       loading: () {
         return const Center(child: CircularProgressIndicator());
       },
-
       error: (error, stack) {
         debugPrint(error.toString());
-
         return const Center(child: Text('Unable to get location'));
       },
-
       data: (location) {
         if (location == null) {
-          return AppMap(mapController: mapController);
+          return AppMap(
+            mapController: mapController,
+            markers: allMarkers,
+          );
         }
 
         final userLocation = GeoPoint(
@@ -62,8 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return AppMap(
           mapController: mapController,
           initialCamera: CameraPosition(target: userLocation, zoom: 15),
-
-          markers: marker == null ? [] : [marker],
+          markers: allMarkers,
         );
       },
     );

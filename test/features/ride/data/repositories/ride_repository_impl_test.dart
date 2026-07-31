@@ -6,12 +6,14 @@ import 'package:ride_together/features/profile/domain/repositories/profile_repos
 import 'package:ride_together/features/ride/data/datasources/ride_remote_data_source.dart';
 import 'package:ride_together/features/ride/data/models/ride_member_model.dart';
 import 'package:ride_together/features/ride/data/models/ride_model.dart';
+import 'package:ride_together/features/ride/data/models/rider_location_model.dart';
 import 'package:ride_together/features/ride/data/repositories/ride_repository_impl.dart';
 import 'package:ride_together/features/ride/domain/entities/ride_status.dart';
 import 'package:ride_together/features/ride/domain/entities/rider_role.dart';
 
 class FakeRideRemoteDataSource implements RideRemoteDataSource {
   final Map<String, RideModel> rides = {};
+  final Map<String, List<RiderLocationModel>> locations = {};
 
   @override
   Future<RideModel> createRide(RideModel ride) async {
@@ -70,6 +72,21 @@ class FakeRideRemoteDataSource implements RideRemoteDataSource {
         rides[rideId]!.copyWith(status: status),
       );
     }
+  }
+
+  @override
+  Future<void> updateRiderLocation(
+    String rideId,
+    RiderLocationModel location,
+  ) async {
+    final rideLocs = locations.putIfAbsent(rideId, () => []);
+    rideLocs.removeWhere((l) => l.userId == location.userId);
+    rideLocs.add(location);
+  }
+
+  @override
+  Stream<List<RiderLocationModel>> watchRideLocations(String rideId) {
+    return Stream.value(locations[rideId] ?? []);
   }
 }
 

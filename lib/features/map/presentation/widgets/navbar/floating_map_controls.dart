@@ -16,6 +16,7 @@ import '../../../../location/presentation/providers/current_posisiton_provider.d
 import 'recenter_button.dart';
 import 'bottom_nav_bar.dart';
 import 'nav_handle.dart';
+import '../../../../ride/presentation/widgets/join_ride_sheet.dart';
 
 class FloatingMapControls extends ConsumerStatefulWidget {
   const FloatingMapControls({super.key, required this.mapController});
@@ -116,6 +117,11 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
     _resetAutoHideTimer();
   }
 
+  void _onJoinRide() {
+    _resetAutoHideTimer();
+    JoinRideSheet.show(context);
+  }
+
   Future<void> _onLogout() async {
     final repository = ref.read(authRepositoryProvider);
     await repository.signOut();
@@ -171,7 +177,7 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
                     child: BottomNavBar(
                       onProfileTap: _resetAutoHideTimer,
                       onMyRidesTap: _resetAutoHideTimer,
-                      onJoinRideTap: _resetAutoHideTimer,
+                      onJoinRideTap: _onJoinRide,
                       onSettingsTap: _resetAutoHideTimer,
                       onLogoutTap: _onLogout,
                     ),

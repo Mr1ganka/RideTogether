@@ -6,6 +6,9 @@
 
 ---
 
+# RunCommand
+- "flutter run --dart-define-from-file=config.json"
+
 # Overview
 
 RideTogether is a mobile-first group ride management application built for:

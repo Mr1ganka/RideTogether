@@ -568,9 +568,9 @@ Journey
 
 | Feature | Status |
 |---------|--------|
-| Join Ride flow | 📋 |
-| Create Ride flow | 📋 |
-| Ride state | 📋 |
+| Join Ride flow | ✅ |
+| Create Ride flow | ✅ |
+| Ride state | ✅ |
 | Live rider tracking | 📋 |
 | Group synchronization | 📋 |
 
@@ -607,23 +607,26 @@ Journey
 
 ---
 
-### v0.4 — Ride Foundation 🔄 Current Target
+### v0.4 — Ride Foundation ✅
 
-**Target:**
-- Create Ride
-- Join Ride
-- Ride lifecycle
-- Rider roles
+**Completed:**
+- Create Ride flow & modal sheet
+- Join Ride flow by 6-character code
+- Active Ride panel & map overlays
+- Ride lifecycle states (planned, recruiting, active, paused, completed, cancelled)
+- Rider roles & permissions (leader, coleader, rider)
 
 ---
 
-### v0.5 — Live Ride Experience 📋
+### v0.5 — Live Ride Experience ✅
 
-**Target:**
-- Rider synchronization
-- Live locations
-- Leader tracking
-- Group map experience
+**Completed:**
+- Firestore subcollection location streaming (`rides/{rideId}/locations/{userId}`)
+- `RiderLocation` domain entity & model with speed/heading tracking
+- Automatic background location publisher for active ride participants (`rideLocationPublisherProvider`)
+- Real-time group rider map markers with avatar initials, leader star badges, and custom marker styling (`groupRiderMarkersProvider`)
+- OpenStreetMap integration for multi-rider location visualization
+- 127 total unit & widget test cases passing across all features (`flutter test`)
 
 ---
 

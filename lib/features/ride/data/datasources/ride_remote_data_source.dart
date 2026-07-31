@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ride_together/features/ride/data/models/ride_model.dart';
+import 'package:ride_together/features/ride/data/models/rider_location_model.dart';
 import 'package:ride_together/features/ride/domain/entities/ride_status.dart';
 
 /// Abstract Remote Data Source interface for Ride data operations.
@@ -30,6 +31,12 @@ abstract class RideRemoteDataSource {
 
   /// Adds a member to an existing ride document.
   Future<void> updateRideMembers(String rideId, RideModel updatedRide);
+
+  /// Updates live location of a rider in subcollection `rides/{rideId}/locations/{userId}`.
+  Future<void> updateRiderLocation(String rideId, RiderLocationModel location);
+
+  /// Stream of all rider live locations in `rides/{rideId}/locations`.
+  Stream<List<RiderLocationModel>> watchRideLocations(String rideId);
 }
 
 /// Firebase Firestore implementation of [RideRemoteDataSource].
@@ -131,6 +138,31 @@ class FirebaseRideRemoteDataSource implements RideRemoteDataSource {
     await _ridesRef.doc(rideId).update({
       'members': map['members'],
       'memberUserIds': updatedRide.members.map((m) => m.rider.id).toList(),
+    });
+  }
+
+  @override
+  Future<void> updateRiderLocation(
+    String rideId,
+    RiderLocationModel location,
+  ) async {
+    await _ridesRef
+        .doc(rideId)
+        .collection('locations')
+        .doc(location.userId)
+        .set(location.toMap());
+  }
+
+  @override
+  Stream<List<RiderLocationModel>> watchRideLocations(String rideId) {
+    return _ridesRef
+        .doc(rideId)
+        .collection('locations')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => RiderLocationModel.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }
