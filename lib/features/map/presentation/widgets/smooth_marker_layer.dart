@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:ride_together/core/theme/app_colors.dart';
+import 'package:ride_together/core/theme/app_radius.dart';
 import 'package:ride_together/features/location/presentation/widgets/constants/location_marker_constants.dart';
 import 'package:ride_together/features/location/presentation/widgets/user_location_marker.dart'
     as location_widget;
@@ -171,38 +173,63 @@ class _SmoothMarkerLayerState extends State<SmoothMarkerLayer>
         );
       }
 
+      final markerColor =
+          marker.isLeader ? AppColors.leaderMarker : AppColors.participantMarker;
+
       return Marker(
         point: point,
-        width: 48,
-        height: 48,
-        alignment: Alignment.topCenter,
-        child: _buildDefaultMarkerPin(context),
+        width: 70,
+        height: 70,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (marker.label != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: markerColor,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (marker.isLeader) ...[
+                      const Icon(
+                        Icons.star,
+                        size: 10,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 2),
+                    ],
+                    Text(
+                      marker.label!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Icon(
+              Icons.navigation,
+              color: markerColor,
+              size: 28,
+            ),
+          ],
+        ),
       );
     }).toList();
 
     return MarkerLayer(markers: flutterMapMarkers);
-  }
-
-  Widget _buildDefaultMarkerPin(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(8),
-      child: const Icon(
-        Icons.location_on_rounded,
-        color: Colors.white,
-        size: 28,
-      ),
-    );
   }
 }

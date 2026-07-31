@@ -10,12 +10,22 @@ class RiderProfileModel extends RiderProfile {
   });
 
   factory RiderProfileModel.fromMap(Map<String, dynamic> map) {
+    DateTime parseDate(dynamic value) {
+      if (value is DateTime) return value;
+      if (value is String) return DateTime.parse(value);
+      try {
+        return (value as dynamic).toDate() as DateTime;
+      } catch (_) {
+        return DateTime.now();
+      }
+    }
+
     return RiderProfileModel(
       id: map['id'] as String,
       displayName: map['displayName'] as String,
       photoUrl: map['photoUrl'] as String?,
-      createdAt: (map['createdAt'] as dynamic).toDate(),
-      updatedAt: (map['updatedAt'] as dynamic).toDate(),
+      createdAt: parseDate(map['createdAt']),
+      updatedAt: parseDate(map['updatedAt']),
     );
   }
 
@@ -24,8 +34,8 @@ class RiderProfileModel extends RiderProfile {
       'id': id,
       'displayName': displayName,
       'photoUrl': photoUrl,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 

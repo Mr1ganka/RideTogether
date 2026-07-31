@@ -1,4 +1,4 @@
-﻿# RideTogether Architecture Documentation
+# RideTogether Architecture Documentation
 
 **Version:** 4.1  
 **Last Updated:** 2026-07-23
@@ -985,6 +985,20 @@ enum RideRole {
   coLeader,
   rider,
 }
+
+### Core Ride Business Rules
+
+1. **Join Anywhere / Anytime (`isJoinable`)**:
+   - A ride is joinable as long as `status != RideStatus.completed` and `status != RideStatus.cancelled`.
+   - Riders can join during `planned`, `recruiting`, `active`, and `paused` states.
+
+2. **Ride Completion**:
+   - **Leader Authority**: Leader has explicit "End Ride" action to transition status to `completed`.
+   - **Smart Geofence Prompt**: System prompts leader when all active members are within destination geofence (~50m).
+
+3. **Emergency Cancellation**:
+   - Leader or Co-Leader can transition to `cancelled` from any state.
+   - Instantly notifies all connected riders and halts active GPS session sharing for that ride.
 ```
 
 ### Map-Ride Separation
@@ -1095,6 +1109,14 @@ Live Ride Experience
 - [ ] Join Ride flow
 - [ ] Ride lifecycle management
 - [ ] Rider roles (Leader, Co-Leader, Rider)
+
+#### MVP Data Architecture & Decisions:
+- **Ride Members List**: Typed as `members` (`List<RideMember>`). Stored as an embedded list inside the primary `rides/{rideId}` document for fast single-read operations.
+  - *TODO (Post-MVP)*: Migrate to a dedicated subcollection (`rides/{rideId}/members`) when scaling to large event rides.
+- **Member Profile Snapshot**: `RideMember` contains full `RiderProfile` for zero-join single-query reads.
+  - *TODO (Post-MVP)*: Decouple to `riderId` references + dynamic profile stream/fetch if real-time profile syncing is needed.
+- **Serialization Standard**: ISO-8601 strings used for all `DateTime` fields in `toMap()` / `fromMap()`.
+
 
 ### Phase 3: Live Ride Experience (v0.5)
 
