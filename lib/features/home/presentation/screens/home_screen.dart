@@ -13,6 +13,9 @@ import '../../../../features/map/presentation/widgets/app_map.dart';
 import '../../../../features/map/presentation/widgets/floating_map_controls.dart';
 import '../../../../features/ride/presentation/providers/ride_location_providers.dart';
 import '../../../../features/ride/presentation/widgets/active_ride_panel.dart';
+import 'dart:developer' as developer;
+
+import '../../../../features/app_update/presentation/widgets/app_update_checker.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -30,18 +33,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final mapController = ref.watch(mapControllerProvider);
     final topPadding = MediaQuery.of(context).padding.top;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          HomeMapView(mapController: mapController),
-          Positioned(
-            top: topPadding + AppSpacing.sm,
-            left: 0,
-            right: 0,
-            child: const ActiveRidePanel(),
-          ),
-          FloatingMapControls(mapController: mapController),
-        ],
+    return AppUpdateChecker(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            HomeMapView(mapController: mapController),
+            Positioned(
+              top: topPadding + AppSpacing.sm,
+              left: 0,
+              right: 0,
+              child: const ActiveRidePanel(),
+            ),
+            FloatingMapControls(mapController: mapController),
+          ],
+        ),
       ),
     );
   }
@@ -68,7 +73,13 @@ class HomeMapView extends ConsumerWidget {
         return const Center(child: CircularProgressIndicator());
       },
       error: (error, stack) {
-        debugPrint(error.toString());
+        developer.log(
+          error.toString(),
+          error: error,
+          stackTrace: stack,
+          name: 'HomeScreen',
+          level: 1000
+        );
         return const Center(child: Text('Unable to get location'));
       },
       data: (location) {
