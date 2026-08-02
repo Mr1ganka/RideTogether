@@ -1115,7 +1115,10 @@ Live Ride Experience
   - *TODO (Post-MVP)*: Migrate to a dedicated subcollection (`rides/{rideId}/members`) when scaling to large event rides.
 - **Member Profile Snapshot**: `RideMember` contains full `RiderProfile` for zero-join single-query reads.
   - *TODO (Post-MVP)*: Decouple to `riderId` references + dynamic profile stream/fetch if real-time profile syncing is needed.
+- **Live Location Telemetry Subcollection**: Stored in `rides/{rideId}/locations/{userId}` for zero document write-lock contention.
+  - *TODO (Scale Migration)*: Keep Firestore subcollections for MVP (100% free Spark plan). When scaling to 100+ concurrent riders per ride, migrate `RideRemoteDataSource` to Firebase Realtime Database (RTDB) or MQTT to eliminate $O(N^2)$ Firestore read fan-out costs while staying on Firebase free tiers.
 - **Serialization Standard**: ISO-8601 strings used for all `DateTime` fields in `toMap()` / `fromMap()`.
+
 
 
 ### Phase 3: Live Ride Experience (v0.5)

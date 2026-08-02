@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ride_together/features/ride/data/models/ride_model.dart';
 import 'package:ride_together/features/ride/data/models/rider_location_model.dart';
@@ -98,24 +99,36 @@ class FirebaseRideRemoteDataSource implements RideRemoteDataSource {
 
   @override
   Stream<RideModel?> watchActiveRideForUser(String userId) {
-    // Watches rides where userId is in memberUserIds array and status is not completed/cancelled
+    // Watches rides where userId is in memberUserIds array and filters out completed/cancelled in Dart
+    // to avoid requiring a composite Firestore index on arrayContains + whereIn.
     return _ridesRef
         .where('memberUserIds', arrayContains: userId)
-        .where('status', whereIn: [
-          RideStatus.planned.name,
-          RideStatus.recruiting.name,
-          RideStatus.active.name,
-          RideStatus.paused.name,
-        ])
         .snapshots()
         .map((snapshot) {
-          if (snapshot.docs.isEmpty) {
-            return null;
-          }
-          // Return the first matching active ride
-          final doc = snapshot.docs.first;
-          return RideModel.fromMap(doc.data(), documentId: doc.id);
-        });
+      if (snapshot.docs.isEmpty) {
+        return null;
+      }
+      final activeDocs = snapshot.docs.where((doc) {
+        final data = doc.data();
+        final status = data['status'] as String?;
+        return status != RideStatus.completed.name &&
+            status != RideStatus.cancelled.name;
+      }).toList();
+
+      if (activeDocs.isEmpty) {
+        return null;
+      }
+      final doc = activeDocs.first;
+      return RideModel.fromMap(doc.data(), documentId: doc.id);
+    }).handleError((error, stackTrace) {
+      developer.log(
+        'Error watching active ride for user: $error',
+        error: error,
+        stackTrace: stackTrace,
+        name: 'RideRemoteDataSource',
+      );
+      return null;
+    });
   }
 
   @override
@@ -141,6 +154,11 @@ class FirebaseRideRemoteDataSource implements RideRemoteDataSource {
     });
   }
 
+  /// TODO(scale): Post-MVP Migration for Location Telemetry
+  /// Currently using Firestore subcollections (`rides/{rideId}/locations/{userId}`) for MVP simplicity.
+  /// When scaling to 100+ concurrent riders per group, migrate this telemetry stream to
+  /// Firebase Realtime Database (RTDB) or MQTT/WebSockets + Redis to eliminate Firestore
+  /// O(N^2) read-fanout costs and improve network bandwidth efficiency on free-tier usage.
   @override
   Future<void> updateRiderLocation(
     String rideId,
@@ -163,6 +181,15 @@ class FirebaseRideRemoteDataSource implements RideRemoteDataSource {
       return snapshot.docs
           .map((doc) => RiderLocationModel.fromMap(doc.data(), doc.id))
           .toList();
+    }).handleError((error, stackTrace) {
+      developer.log(
+        'Error watching ride locations: $error',
+        error: error,
+        stackTrace: stackTrace,
+        name: 'RideRemoteDataSource',
+      );
+      return <RiderLocationModel>[];
     });
   }
 }
+

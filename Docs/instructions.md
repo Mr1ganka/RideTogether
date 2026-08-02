@@ -1,4 +1,4 @@
-﻿# RideTogether AI Development Instructions
+# RideTogether AI Development Instructions
 
 **Version:** 4.1  
 **Last Updated:** 2026-07-23
@@ -513,45 +513,22 @@ Each mode controls visible overlays and FloatingMapControls behavior:
 
 ---
 
-### Phase 5 — Live Rider Experience
+### Phase 5 — Live Rider Experience ✅ COMPLETED
 
-**Future:**
-
-**Rider Markers:**
-```
-Rider A        Rider B
-  🚦             🚦
-```
-
-**Architecture:**
-```
-Rider Location
-      ↓
-Ride State
-      ↓
-Map Overlay
-      ↓
-MapScreen
-```
+**Features:**
+- Real-time rider markers on `AppMap` with live heading directional arrows (`Transform.rotate`)
+- Distinct color palette assignment per rider (`_riderPalette`)
+- Recenter and `FitGroupButton` controls to zoom/fit all live group participants on screen
+- Stacked top notification banner system (`NotchUpdateBanner` + `ActiveRidePanel` with 4px gap and smooth slide animations)
 
 ---
 
-### Phase 6 — Background Tracking
+### Phase 6 — Background Tracking & Consent Controls ✅ COMPLETED
 
-**Only after Ride exists.**
-
-**Flow:**
-```
-GPS
-  ↓
-Location Repository
-  ↓
-Ride Location Service
-  ↓
-Cloud Backend
-  ↓
-Other Riders
-```
+**Features:**
+- Android 14+ Foreground Location Service (`flutter_foreground_task`) with `POST_NOTIFICATIONS` permission management
+- Persistent Android Notification Bar status card with 1-tap **"Stop Sharing"** action button
+- Privacy-first `BackgroundConsentSheet` prompting riders upon joining a ride and when opening/resuming the app during active rides
 
 ---
 

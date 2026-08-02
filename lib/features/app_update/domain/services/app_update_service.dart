@@ -32,7 +32,9 @@ class AppUpdateService {
     );
     final isBelowLatest = isVersionOutdated(currentVersion, info.latestVersion);
 
-    if (isBelowMin || info.updateType == UpdateDecision.mandatory.value) {
+    if (isBelowMin ||
+        (isBelowLatest &&
+            info.updateType == UpdateDecision.mandatory.value)) {
       return UpdateDecision.mandatory;
     } else if (isBelowLatest) {
       if (info.updateType == UpdateDecision.silent.value) {

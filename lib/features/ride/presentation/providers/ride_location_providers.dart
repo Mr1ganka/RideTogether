@@ -1,11 +1,33 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ride_together/core/theme/app_colors.dart';
 import 'package:ride_together/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:ride_together/features/location/presentation/providers/current_posisiton_provider.dart';
 import 'package:ride_together/features/map/domain/entities/geo_point.dart';
 import 'package:ride_together/features/map/domain/entities/map_marker.dart';
+import 'package:ride_together/features/ride/domain/entities/ride_member.dart';
 import 'package:ride_together/features/ride/domain/entities/rider_location.dart';
 import 'package:ride_together/features/ride/domain/entities/rider_role.dart';
 import 'package:ride_together/features/ride/presentation/providers/ride_repository_provider.dart';
+
+const _riderPalette = [
+  Color(0xFFE53935), // Crimson Red
+  Color(0xFFD81B60), // Vibrant Pink
+  Color(0xFF8E24AA), // Deep Purple
+  Color(0xFF3949AB), // Indigo
+  Color(0xFF00ACC1), // Cyan
+  Color(0xFF00897B), // Teal
+  Color(0xFF43A047), // Emerald Green
+  Color(0xFFFB8C00), // Bright Orange
+  Color(0xFFF57C00), // Dark Amber
+  Color(0xFF6D4C41), // Copper
+];
+
+Color _getRiderColor(String userId, bool isLeader, int memberIndex) {
+  if (isLeader) return AppColors.leaderMarker;
+  final index = memberIndex >= 0 ? memberIndex : userId.hashCode.abs();
+  return _riderPalette[index % _riderPalette.length];
+}
 
 /// Provider streaming live locations for all riders in the active group ride.
 final groupRiderLocationsProvider = StreamProvider<List<RiderLocation>>((ref) {
@@ -39,10 +61,12 @@ final rideLocationPublisherProvider = Provider<void>((ref) {
     updatedAt: DateTime.now(),
   );
 
-  repository.updateRiderLocation(
-    rideId: activeRide.id,
-    location: location,
-  );
+  Future.microtask(() {
+    repository.updateRiderLocation(
+      rideId: activeRide.id,
+      location: location,
+    );
+  });
 });
 
 /// Provider transforming group rider locations into map markers for rendering on AppMap.
@@ -62,11 +86,17 @@ final groupRiderMarkersProvider = Provider<List<MapMarker>>((ref) {
     // Skip rendering local user here as local user has dedicated high-res userMarkerProvider
     if (loc.userId == currentUserId) continue;
 
-    // Find member details
-    final member = activeRide.members.firstWhere(
-      (m) => m.rider.id == loc.userId,
-      orElse: () => activeRide.leader,
-    );
+    // Find member details and index for distinct color mapping
+    RideMember? member;
+    int memberIndex = -1;
+    for (int i = 0; i < activeRide.members.length; i++) {
+      if (activeRide.members[i].rider.id == loc.userId) {
+        member = activeRide.members[i];
+        memberIndex = i;
+        break;
+      }
+    }
+    member ??= activeRide.leader;
 
     final isLeader = member.role == RiderRole.leader;
     final displayName = member.rider.displayName;
@@ -80,6 +110,8 @@ final groupRiderMarkersProvider = Provider<List<MapMarker>>((ref) {
         ),
         label: displayName,
         isLeader: isLeader,
+        heading: loc.heading,
+        color: _getRiderColor(loc.userId, isLeader, memberIndex),
       ),
     );
   }

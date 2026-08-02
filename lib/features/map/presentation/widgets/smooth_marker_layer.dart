@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -173,12 +174,13 @@ class _SmoothMarkerLayerState extends State<SmoothMarkerLayer>
         );
       }
 
-      final markerColor =
-          marker.isLeader ? AppColors.leaderMarker : AppColors.participantMarker;
+      final markerColor = marker.color ??
+          (marker.isLeader ? AppColors.leaderMarker : AppColors.participantMarker);
+      final headingRad = (marker.heading ?? 0.0) * (math.pi / 180.0);
 
       return Marker(
         point: point,
-        width: 70,
+        width: 110,
         height: 70,
         alignment: Alignment.center,
         child: Column(
@@ -186,6 +188,7 @@ class _SmoothMarkerLayerState extends State<SmoothMarkerLayer>
           children: [
             if (marker.label != null)
               Container(
+                constraints: const BoxConstraints(maxWidth: 104),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: markerColor,
@@ -209,21 +212,28 @@ class _SmoothMarkerLayerState extends State<SmoothMarkerLayer>
                       ),
                       const SizedBox(width: 2),
                     ],
-                    Text(
-                      marker.label!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                    Flexible(
+                      child: Text(
+                        marker.label!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            Icon(
-              Icons.navigation,
-              color: markerColor,
-              size: 28,
+            Transform.rotate(
+              angle: headingRad,
+              child: Icon(
+                Icons.navigation,
+                color: markerColor,
+                size: 28,
+              ),
             ),
           ],
         ),

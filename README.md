@@ -6,8 +6,17 @@
 
 ---
 
-# RunCommand
+#### RunCommand
 - "flutter run --dart-define-from-file=config.json"
+
+#### 2. Building Release APK (for Android Sideloading & Testing)  
+-  "flutter build apk --release --dart-define-from-file=config.json"
+
+#### 2. Building Release APK (for Android Sideloading & Testing)
+- "flutter build apk --release --dart-define-from-file=config.json"
+  
+#### 3. Building App Bundle (for Google Play Store Upload)
+-  "flutter build appbundle --release --dart-define-from-file=config.json"
 
 # Overview
 
@@ -50,7 +59,7 @@ RideTogether helps groups ride together safely with:
 
 ## Version
 
-`v0.0.1 — Foundation Setup`
+`v1.0.1 — Live Rider Tracking & Background Location Release`
 
 The initial application foundation is complete.
 

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ride_together/core/theme/app_durations.dart';
 import 'package:ride_together/core/theme/app_radius.dart';
 import 'package:ride_together/core/theme/app_spacing.dart';
+import 'package:ride_together/features/location/presentation/widgets/background_consent_sheet.dart';
 import 'package:ride_together/features/ride/presentation/providers/ride_controller_provider.dart';
 
 import 'create_ride_sheet.dart';
@@ -59,6 +60,7 @@ class _JoinRideSheetState extends ConsumerState<JoinRideSheet> {
     if (mounted) {
       if (ride != null) {
         Navigator.of(context).pop();
+        BackgroundConsentSheet.show(context);
       } else {
         final error = ref.read(rideControllerProvider).error;
         setState(() {

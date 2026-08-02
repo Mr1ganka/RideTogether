@@ -69,4 +69,10 @@ abstract final class AppDurations {
 
   /// Bottom nav auto-hide delay.
   static const Duration autoHideNav = Duration(seconds: 3);
+
+  /// Top update banner auto-minimize delay.
+  static const Duration autoMinimizeBanner = Duration(seconds: 3);
+
+  /// Active ride panel dropdown auto-collapse delay.
+  static const Duration autoCollapsePanel = Duration(seconds: 3);
 }

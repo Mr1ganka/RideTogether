@@ -15,10 +15,12 @@ import '../../../../auth/presentation/providers/auth_repository_provider.dart';
 import '../../../../location/presentation/providers/current_posisiton_provider.dart';
 
 import 'recenter_button.dart';
+import 'fit_group_button.dart';
 import 'zoom_controls.dart';
 import 'bottom_nav_bar.dart';
 import 'nav_handle.dart';
 import '../../../../ride/presentation/widgets/join_ride_sheet.dart';
+import '../../../../ride/presentation/providers/ride_location_providers.dart';
 
 class FloatingMapControls extends ConsumerStatefulWidget {
   const FloatingMapControls({super.key, required this.mapController});
@@ -122,6 +124,42 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
     _resetAutoHideTimer();
   }
 
+  void _onFitGroupRiders() {
+    final position = ref.read(currentPositionProvider).value;
+    final groupMarkers = ref.read(groupRiderMarkersProvider);
+
+    final points = <LatLng>[];
+    if (position != null) {
+      points.add(LatLng(position.latitude, position.longitude));
+    }
+    for (final m in groupMarkers) {
+      points.add(LatLng(m.position.latitude, m.position.longitude));
+    }
+
+    if (points.isEmpty) return;
+
+    if (points.length == 1) {
+      animatedMapMove(
+        mapController: widget.mapController,
+        vsync: this,
+        destLocation: points.first,
+        destZoom: 15.0,
+        duration: const Duration(milliseconds: 650),
+      );
+    } else {
+      final bounds = LatLngBounds.fromPoints(points);
+      animatedFitBounds(
+        mapController: widget.mapController,
+        vsync: this,
+        bounds: bounds,
+        padding: 60.0,
+        duration: const Duration(milliseconds: 650),
+      );
+    }
+
+    _resetAutoHideTimer();
+  }
+
   void _onZoomIn() {
     final camera = widget.mapController.camera;
     animatedMapMove(
@@ -192,6 +230,10 @@ class _FloatingMapControlsState extends ConsumerState<FloatingMapControls>
                 onZoomOut: _onZoomOut,
               ),
               const SizedBox(height: 12),
+              if (mode == MapMode.activeRide) ...[
+                FitGroupButton(onTap: _onFitGroupRiders),
+                const SizedBox(height: 12),
+              ],
               RecenterButton(onTap: _onRecenter),
             ],
           ),

@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ride_together/core/theme/app_colors.dart';
+import 'package:ride_together/core/theme/app_durations.dart';
 import 'package:ride_together/core/theme/app_radius.dart';
 import 'package:ride_together/core/theme/app_spacing.dart';
 import 'package:ride_together/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:ride_together/features/location/presentation/providers/background_consent_provider.dart';
+import 'package:ride_together/features/location/presentation/widgets/background_consent_sheet.dart';
 import 'package:ride_together/features/ride/domain/entities/ride_status.dart';
 import 'package:ride_together/features/ride/domain/entities/rider_role.dart';
 import 'package:ride_together/features/ride/presentation/providers/ride_controller_provider.dart';
@@ -20,6 +24,35 @@ class ActiveRidePanel extends ConsumerStatefulWidget {
 
 class _ActiveRidePanelState extends ConsumerState<ActiveRidePanel> {
   bool _isExpanded = false;
+  Timer? _autoCollapseTimer;
+
+  @override
+  void dispose() {
+    _autoCollapseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+    if (_isExpanded) {
+      _startAutoCollapseTimer();
+    } else {
+      _autoCollapseTimer?.cancel();
+    }
+  }
+
+  void _startAutoCollapseTimer() {
+    _autoCollapseTimer?.cancel();
+    _autoCollapseTimer = Timer(AppDurations.autoCollapsePanel, () {
+      if (mounted && _isExpanded) {
+        setState(() {
+          _isExpanded = false;
+        });
+      }
+    });
+  }
 
   void _copyJoinCode(String code) {
     Clipboard.setData(ClipboardData(text: code));
@@ -62,24 +95,34 @@ class _ActiveRidePanelState extends ConsumerState<ActiveRidePanel> {
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
+          curve: Curves.easeInOutCubic,
           margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: 0.95),
+            color: theme.colorScheme.surface.withValues(alpha: 0.98),
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.25),
+              width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                blurRadius: 16,
+                spreadRadius: 1,
+                offset: const Offset(0, 4),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs + 4,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,6 +136,13 @@ class _ActiveRidePanelState extends ConsumerState<ActiveRidePanel> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _getStatusColor(ride.status, theme),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getStatusColor(ride.status, theme).withValues(alpha: 0.5),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
@@ -153,98 +203,140 @@ class _ActiveRidePanelState extends ConsumerState<ActiveRidePanel> {
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        _isExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isExpanded = !_isExpanded;
-                        });
+                    const SizedBox(width: AppSpacing.xs),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final consentState = ref.watch(backgroundConsentProvider);
+                        final isAccepted = consentState == BackgroundConsentState.accepted;
+                        return IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          icon: Icon(
+                            isAccepted
+                                ? Icons.my_location
+                                : Icons.location_off_outlined,
+                            size: 18,
+                            color: isAccepted
+                                ? AppColors.success
+                                : theme.colorScheme.outline,
+                          ),
+                          tooltip: isAccepted
+                              ? 'Background Location: Active (Tap to change)'
+                              : 'Background Location: Disabled (Tap to enable)',
+                          onPressed: () => BackgroundConsentSheet.show(context),
+                        );
                       },
+                    ),
+                    IconButton(
+                      icon: AnimatedRotation(
+                        turns: _isExpanded ? 0.5 : 0.0,
+                        duration: AppDurations.normal,
+                        curve: Curves.easeInOutCubic,
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      onPressed: _toggleExpanded,
                     ),
                   ],
                 ),
 
-                if (_isExpanded) ...[
-                  const Divider(height: AppSpacing.md),
-                  if (ride.description != null &&
-                      ride.description!.isNotEmpty) ...[
-                    Text(
-                      ride.description!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  // Member list
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Riders (${ride.members.length})',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  ...ride.members.map((member) {
-                    final isMemberLeader = member.role == RiderRole.leader;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 14,
-                            backgroundColor:
-                                theme.colorScheme.secondaryContainer,
-                            child: Text(
-                              member.rider.displayName.isNotEmpty
-                                  ? member.rider.displayName[0].toUpperCase()
-                                  : 'R',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          Expanded(
-                            child: Text(
-                              member.rider.displayName,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ),
-                          if (isMemberLeader)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.tertiaryContainer,
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.sm),
-                              ),
-                              child: Text(
-                                'LEADER',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onTertiaryContainer,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
+                ClipRect(
+                  child: AnimatedSize(
+                    duration: AppDurations.normal,
+                    curve: Curves.easeInOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: _isExpanded
+                        ? Column(
+                            key: const ValueKey('expanded_details'),
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Divider(height: AppSpacing.md),
+                              if (ride.description != null &&
+                                  ride.description!.isNotEmpty) ...[
+                                Text(
+                                  ride.description!,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
+                                const SizedBox(height: AppSpacing.sm),
+                              ],
+
+                              // Member list
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Riders (${ride.members.length})',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
+                              const SizedBox(height: AppSpacing.xs),
+                              ...ride.members.map((member) {
+                                final isMemberLeader = member.role == RiderRole.leader;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor:
+                                            theme.colorScheme.secondaryContainer,
+                                        child: Text(
+                                          member.rider.displayName.isNotEmpty
+                                              ? member.rider.displayName[0].toUpperCase()
+                                              : 'R',
+                                          style: theme.textTheme.labelSmall?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: AppSpacing.xs),
+                                      Expanded(
+                                        child: Text(
+                                          member.rider.displayName,
+                                          style: theme.textTheme.bodyMedium,
+                                        ),
+                                      ),
+                                      if (isMemberLeader)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.tertiaryContainer,
+                                            borderRadius:
+                                                BorderRadius.circular(AppRadius.sm),
+                                          ),
+                                          child: Text(
+                                            'LEADER',
+                                            style: theme.textTheme.labelSmall?.copyWith(
+                                              color: theme.colorScheme.onTertiaryContainer,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          )
+                        : const SizedBox(
+                            key: ValueKey('collapsed_details'),
+                            width: double.infinity,
+                            height: 0,
+                          ),
+                  ),
+                ),
 
                 const SizedBox(height: AppSpacing.sm),
 
